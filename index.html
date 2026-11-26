@@ -303,6 +303,7 @@
       <img id="homeLogo" alt="" hidden style="max-height:72px;max-width:60%;object-fit:contain;display:block;margin:0 0 10px;">
       <div class="eyebrow" id="homeEyebrow">Caisse</div>
       <h1 class="display">Caisse</h1>
+      <div id="homeWho" class="muted" style="font-size:13px;margin:-2px 0 10px;" hidden></div>
       <button class="home-btn primary" id="btnModeBuvette" type="button"><strong>Buvette</strong><span>Vente simple, sans cuisine. S'ouvre toute seule à la première vente et se ferme à minuit.</span></button>
       <button class="home-btn" id="btnModeEvent" type="button"><strong>Événement</strong><span>Soirée, match, tournoi : cuisine, remise, produits.</span></button>
       <button class="home-btn" id="btnModeProduits" type="button"><strong>Produits &amp; cartes</strong><span>Catalogue, prix, import des listes. Protégé par le code responsable.</span></button>
@@ -405,7 +406,10 @@
     <div class="product-row">
       <div class="muted" style="font-size:13px;margin-bottom:8px;" id="buvInfo"></div>
       <div class="muted" style="font-size:12px;margin-bottom:8px;">Les produits vendus à la buvette. Pour la remplacer ou la compléter : importe une liste (une ligne par produit).</div>
-      <button class="btn btn-outline btn-sm" id="btnImportBuv" type="button">Importer la carte Buvette</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-accent btn-sm" id="btnEditBuv" type="button">Voir / modifier la carte Buvette</button>
+        <button class="btn btn-outline btn-sm" id="btnImportBuv" type="button">Importer une liste</button>
+      </div>
     </div>
 
     <div class="section-label">Cartes d'événements</div>
@@ -420,9 +424,15 @@
 
     <div class="section-label">Catalogue général</div>
     <div class="muted" style="font-size:12px;margin:0 2px 8px;">Tous les produits, toutes cartes confondues. Un produit ajouté ou importé dans une carte arrive ici tout seul.</div>
+    <input type="search" id="catSearch" placeholder="Chercher un produit (ex. café)" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;margin-bottom:8px;background:var(--surface);color:var(--ink);">
     <div id="productsList"></div>
     <button class="btn btn-accent btn-block" id="btnAddProduct" style="margin-top:6px;">+ Ajouter un produit</button>
     <button class="btn btn-outline btn-block" id="btnImport" type="button" style="margin-top:8px;">Importer dans le catalogue</button>
+    <div class="product-row" style="margin-top:14px;">
+      <div class="muted" style="font-size:12px;margin-bottom:8px;" id="exInfo"></div>
+      <button class="btn btn-outline btn-sm" id="btnExamples" type="button">Créer des exemples (marqués TEST)</button>
+      <button class="btn btn-ghost btn-sm" id="btnExamplesDel" type="button">Supprimer les exemples</button>
+    </div>
   </main>
 
   <main id="view-reglages" hidden>
@@ -445,9 +455,20 @@
       </div>
       <div class="muted" style="font-size:12px;">Chaque téléphone reçoit tout seul sa propre lettre (A, B, C…) pour chaque événement ou journée de buvette. Ne change rien ici sauf besoin particulier.</div>
     </div>
-    <div class="section-label">Prénom habituel</div>
+    <div class="section-label">Qui es-tu ?</div>
     <div class="product-row">
-      <div class="pr-field"><label for="inpPrenom">Ton prénom (inscrit sur tes commandes)</label><input type="text" id="inpPrenom" autocomplete="given-name"></div>
+      <div id="whoInfo" style="font-size:14px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="btn btn-accent btn-sm" id="btnWhoChange" type="button">Choisir dans la liste des adhérents</button>
+      </div>
+      <div class="pr-field"><label for="inpPrenom">Ou écrire seulement ton prénom (sans liste)</label><input type="text" id="inpPrenom" autocomplete="given-name"></div>
+      <div class="muted" style="font-size:12px;margin-top:8px;" id="adhInfo"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+        <button class="btn btn-outline btn-sm" id="btnAdhLoad" type="button">Charger la liste des adhérents</button>
+        <button class="btn btn-ghost btn-sm" id="btnAdhClear" type="button">Retirer la liste</button>
+      </div>
+      <input type="file" id="fileAdh" accept=".csv,.txt,.tsv,.json,text/csv,text/plain,application/json" hidden>
+      <div class="muted" style="font-size:12px;margin-top:6px;">Fichier avec une ligne par personne : nom, prénom, numéro de licence (séparés par « ; », virgule ou tabulation, avec ou sans ligne de titres). Protégé par le code responsable.</div>
     </div>
 
     <div class="section-label">Au démarrage</div>
@@ -465,6 +486,16 @@
         <button class="btn btn-ghost btn-sm" id="btnClubClear" type="button">Retirer la charte</button>
       </div>
       <input type="file" id="fileClub" accept=".json,application/json" hidden>
+    </div>
+
+    <div class="section-label">Fichier de démarrage</div>
+    <div class="product-row">
+      <div class="muted" style="font-size:12px;margin-bottom:8px;">Un seul fichier qui prépare toute la caisse d'un club : charte, produits, cartes et liste des adhérents. Idéal pour installer un nouveau club ou sauvegarder ta configuration.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" id="btnStartLoad" type="button">Charger un fichier de démarrage</button>
+        <button class="btn btn-ghost btn-sm" id="btnStartExport" type="button">Exporter ma configuration</button>
+      </div>
+      <input type="file" id="fileStart" accept=".json,application/json" hidden>
     </div>
 
     <div class="section-label">Informations</div>
@@ -511,11 +542,30 @@
   </div>
 </div>
 
+<div class="overlay" id="overlayWho" hidden>
+  <div class="sheet">
+    <h2>Qui es-tu ?</h2>
+    <div class="muted" style="font-size:13px;margin-bottom:8px;">Tape quelques lettres de ton prénom ou de ton nom, puis touche ton nom.</div>
+    <input type="search" id="inpWho" autocomplete="off" placeholder="Prénom ou nom" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:16px;background:var(--surface);color:var(--ink);">
+    <div id="whoList" style="margin-top:8px;"></div>
+    <div class="sheet-actions" style="margin-top:12px;"><button class="btn btn-outline" id="btnWhoSkip" type="button">Pas dans la liste / plus tard</button></div>
+  </div>
+</div>
 <div class="overlay" id="overlayCard" hidden>
   <div class="sheet" style="max-height:92vh;overflow:auto;">
     <h2 id="cardTitle">Nouvelle carte</h2>
-    <div class="field"><label for="inpCardName">Nom de la carte</label><input type="text" id="inpCardName" placeholder="ex. Soirée saucisse-frites"></div>
-    <div class="muted" style="font-size:12px;margin-bottom:6px;">Coche les produits de cette carte et règle leurs prix.</div>
+    <div class="field" id="cardNameWrap"><label for="inpCardName">Nom de la carte</label><input type="text" id="inpCardName" placeholder="ex. Soirée saucisse-frites"></div>
+    <div class="muted" style="font-size:12px;margin-bottom:6px;" id="cardHelp">Coche les produits de cette carte et règle leurs prix.</div>
+    <input type="search" id="edSearch" placeholder="Chercher un produit" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;margin-bottom:8px;background:var(--surface);color:var(--ink);">
+    <div class="product-row" style="margin-bottom:10px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px;">Un produit qui n'existe pas encore ?</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="edNewName" placeholder="Nom (ex. Tartiflette)" style="flex:2 1 140px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);">
+        <input type="number" id="edNewPrice" placeholder="Prix €" step="0.10" min="0" style="flex:1 1 70px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);">
+        <select id="edNewCat" style="flex:1 1 110px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);"><option value="grill">Grillades / snack</option><option value="boisson">Boissons</option><option value="sucre">Sucré</option></select>
+        <button class="btn btn-accent btn-sm" id="btnEdNew" type="button">Ajouter</button>
+      </div>
+    </div>
     <div id="cardRows"></div>
     <div class="sheet-actions" style="margin-top:14px;"><button class="btn btn-outline" id="btnCardCancel" type="button">Annuler</button><button class="btn btn-accent" id="btnCardSave" type="button">Enregistrer la carte</button></div>
   </div>
@@ -846,7 +896,7 @@
 
   // ---------- app state ----------
   var store = null;
-  var APP_VERSION = 'Caisse Buvette CCBB · v5.3 · 26/11/2026';
+  var APP_VERSION = 'Caisse Buvette CCBB · v6.0 · 26/11/2026';
   var state = { products: [], events: [], orders: [], services: [], settings: [], cartes: [], view: 'accueil', mode: null, detailEventId: null, seeded: false };
   var cart = []; // [{ productId, name, category, prep, unitPrice, unitCost, qty }]
   var lastFlashId = null;
@@ -1805,9 +1855,12 @@
   }
 
   function renderProduits(){
-    renderCards();
+    renderCards(); renderExamples();
     var list = document.getElementById('productsList');
-    var products = state.products.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    var catRank = { grill: 0, boisson: 1, sucre: 2 };
+    var q = normTxt((document.getElementById('catSearch') || {}).value || '');
+    var products = state.products.slice().sort(function(a,b){ return ((catRank[a.category] || 0) - (catRank[b.category] || 0)) || String(a.name).localeCompare(String(b.name)); })
+      .filter(function(p){ return !q || normTxt(p.name).indexOf(q) >= 0; });
     list.innerHTML = products.map(function(p){
       var margin = (p.price||0) - (p.cost||0);
       return '<div class="product-row" data-id="' + p.id + '">' +
@@ -1893,6 +1946,185 @@
     document.getElementById('view-reglages').hidden = state.view !== 'reglages';
   }
 
+  // ---------- adhérents, identité, fichier de démarrage, exemples ----------
+  function getAdherents(){
+    var d = state.settings.find(function(x){ return x.id === 'adherents'; });
+    if (d && d.list) return d.list;
+    try { var raw = localStorage.getItem('ccbb_adh'); return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+  }
+  function csvLine(line, d){
+    var out = [], cur = '', q = false;
+    for (var i = 0; i < line.length; i++){
+      var ch = line[i];
+      if (q){ if (ch === '"'){ if (line[i+1] === '"'){ cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === d){ out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    out.push(cur); return out.map(function(x){ return x.trim(); });
+  }
+  function parseAdherents(text){
+    text = String(text || '').replace(/^\ufeff/, '');
+    var list = [];
+    if (/^\s*[\[{]/.test(text)){
+      var j; try { j = JSON.parse(text); } catch(e){ return { error: 'Fichier illisible (JSON invalide).' }; }
+      var arr = Array.isArray(j) ? j : (j.adherents || j.licencies || []);
+      arr.forEach(function(r){ if (!r || typeof r !== 'object') return; var n = cleanStr(r.nom || r.n || r.NOM || '', 80), p = cleanStr(r.prenom || r['prénom'] || r.p || '', 80), l = cleanStr(String(r.licence || r.l || r.numero || ''), 30); if (n || p) list.push({ n: n, p: p, l: l }); });
+    } else {
+      var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+      if (!lines.length) return { error: 'Le fichier est vide.' };
+      var counts = { ';': 0, ',': 0, '\t': 0 }; Object.keys(counts).forEach(function(k){ counts[k] = lines[0].split(k).length - 1; });
+      var d = ';'; if (counts[';'] < counts[','] && counts[','] >= counts['\t']) d = ','; if (counts['\t'] > counts[';'] && counts['\t'] > counts[',']) d = '\t';
+      var head = csvLine(lines[0], d).map(normTxt);
+      var iN = head.findIndex(function(h){ return /^nom/.test(h) && !/prenom/.test(h); }), iP = head.findIndex(function(h){ return /prenom/.test(h); }), iL = head.findIndex(function(h){ return /licen|numero|^n°/.test(h); });
+      var hasHead = iN >= 0 || iP >= 0 || iL >= 0;
+      if (!hasHead){ iN = 0; iP = 1; iL = 2; }
+      (hasHead ? lines.slice(1) : lines).forEach(function(ln){
+        var c = csvLine(ln, d);
+        var n = cleanStr(c[iN] || '', 80), p = iP >= 0 ? cleanStr(c[iP] || '', 80) : '', l = iL >= 0 ? cleanStr(c[iL] || '', 30) : '';
+        if (n || p) list.push({ n: n, p: p, l: l });
+      });
+    }
+    if (!list.length) return { error: 'Aucune personne trouvée dans ce fichier.' };
+    if (list.length > 3000) list = list.slice(0, 3000);
+    list.sort(function(a,b){ return (a.n + a.p).localeCompare(b.n + b.p); });
+    return { list: list };
+  }
+  async function saveAdherents(list){
+    try { localStorage.setItem('ccbb_adh', JSON.stringify(list)); } catch(e){}
+    await store.settings.set('adherents', { list: list, updatedAt: Date.now() });
+    state.settings = state.settings.filter(function(x){ return x.id !== 'adherents'; }).concat([{ id: 'adherents', list: list }]);
+    renderWho();
+  }
+  function whoLabel(r){ return ((r.p || '') + ' ' + (r.n || '')).trim(); }
+  function setWho(r){
+    try { localStorage.setItem('ccbb_who', JSON.stringify(r)); localStorage.setItem('ccbb_prenom', whoLabel(r)); } catch(e){}
+    renderWho();
+  }
+  function renderWho(){
+    var who = null; try { who = JSON.parse(localStorage.getItem('ccbb_who') || 'null'); } catch(e){}
+    var name = ''; try { name = localStorage.getItem('ccbb_prenom') || ''; } catch(e){}
+    var list = getAdherents();
+    var hw = document.getElementById('homeWho');
+    if (hw){ hw.hidden = !(name || list.length); hw.innerHTML = name ? 'Connecté : <b>' + escapeHtml(name) + '</b> · <a href="#" id="lnkWho" style="color:var(--accent-text,var(--accent));font-weight:600;">changer</a>' : (list.length ? '<a href="#" id="lnkWho" style="color:var(--accent-text,var(--accent));font-weight:600;">Qui es-tu ?</a>' : ''); var l = document.getElementById('lnkWho'); if (l) l.onclick = function(e){ e.preventDefault(); openWho(); }; }
+    var wi = document.getElementById('whoInfo'); if (wi) wi.textContent = name ? 'Tu es : ' + name + (who && who.l ? ' (licence ' + who.l + ')' : '') : 'Personne choisie sur ce téléphone.';
+    var ai = document.getElementById('adhInfo'); if (ai) ai.textContent = list.length ? 'Liste chargée : ' + list.length + ' personnes.' : 'Aucune liste d\'adhérents chargée.';
+    var cl = document.getElementById('btnAdhClear'); if (cl) cl.hidden = !list.length;
+    var ch = document.getElementById('btnWhoChange'); if (ch) ch.hidden = !list.length;
+  }
+  function renderWhoList(){
+    var q = normTxt(document.getElementById('inpWho').value), list = getAdherents(), box = document.getElementById('whoList');
+    if (!q){ box.innerHTML = '<div class="muted" style="padding:8px;font-size:13px;">' + list.length + ' personnes dans la liste.</div>'; return; }
+    var toks = q.split(/\s+/);
+    var res = list.filter(function(r){ var h = normTxt(r.p + ' ' + r.n + ' ' + r.n + ' ' + r.p + ' ' + r.l); return toks.every(function(t){ return h.indexOf(t) >= 0; }); }).slice(0, 8);
+    box.innerHTML = res.map(function(r, i){ return '<button type="button" class="btn btn-ghost btn-block who-pick" data-i="' + i + '" style="text-align:left;margin-bottom:6px;"><b>' + escapeHtml(whoLabel(r)) + '</b>' + (r.l ? ' <span class="muted" style="font-size:12px;">· licence ' + escapeHtml(r.l) + '</span>' : '') + '</button>'; }).join('') || '<div class="muted" style="padding:8px;font-size:13px;">Personne ne correspond.</div>';
+    box.querySelectorAll('.who-pick').forEach(function(b){ b.onclick = function(){ setWho(res[+b.getAttribute('data-i')]); document.getElementById('overlayWho').hidden = true; showToast('Bonjour ' + ((res[+b.getAttribute('data-i')].p) || '') + ' !'); }; });
+  }
+  function openWho(){ document.getElementById('inpWho').value = ''; renderWhoList(); document.getElementById('overlayWho').hidden = false; setTimeout(function(){ try { document.getElementById('inpWho').focus(); } catch(e){} }, 150); }
+  var whoAsked = false;
+  function maybeAskWho(){
+    if (whoAsked) return;
+    if (!getAdherents().length) return;
+    var has = false; try { has = !!localStorage.getItem('ccbb_who') || sessionStorage.getItem('ccbb_who_skip') === '1'; } catch(e){}
+    if (has) return;
+    whoAsked = true; openWho();
+  }
+
+  // fichier de démarrage
+  function saveTextFile(text, filename){
+    try {
+      var blob = new Blob([text], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1500);
+      return true;
+    } catch(e){ return false; }
+  }
+  function exportStart(){
+    var club = getClub(); var c = club ? JSON.parse(JSON.stringify(club)) : null; if (c){ delete c.id; delete c.updatedAt; }
+    var data = {
+      format: 'caisse-demarrage-1', exporte: new Date().toISOString().slice(0, 10), club: c,
+      produits: state.products.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).map(function(p){ return { nom: p.name, prix: p.price, achat: p.cost || 0, categorie: p.category, prep: !!p.prep, buvette: !!p.buvette, recap: p.recap || '', actif: p.active !== false, exemple: !!p.example }; }),
+      cartes: state.cartes.map(function(k){ return { nom: k.name, exemple: !!k.example, produits: (k.items || []).map(function(it){ return { nom: it.name, prix: it.price }; }) }; }),
+      adherents: getAdherents().map(function(r){ return { nom: r.n, prenom: r.p, licence: r.l }; })
+    };
+    var nm = slugify((club && (club.court || club.nom)) || 'club');
+    if (saveTextFile(JSON.stringify(data, null, 1), 'Demarrage_caisse_' + nm + '_' + todayISO() + '.json')) showToast('Fichier de démarrage téléchargé');
+  }
+  async function loadStart(file){
+    var d; try { d = JSON.parse(await file.text()); } catch(e){ showToast('Fichier illisible (JSON invalide).'); return; }
+    if (!d || d.format !== 'caisse-demarrage-1'){ showToast('Ce n\'est pas un fichier de démarrage de la caisse.'); return; }
+    var msgs = [];
+    if (d.club && typeof d.club === 'object'){
+      var r = parseClubFile(JSON.stringify(Object.assign({ format: 'compteur-club-1' }, d.club)));
+      if (r.club){ try { localStorage.setItem('ccbb_club', JSON.stringify(r.club)); } catch(e){} await store.settings.set('club', r.club); state.settings = state.settings.filter(function(x){ return x.id !== 'club'; }).concat([Object.assign({ id: 'club' }, r.club)]); applyClub(); renderClubInfo(); msgs.push('charte'); }
+    }
+    var idByName = {}; state.products.forEach(function(p){ idByName[normTxt(p.name)] = p.id; });
+    var nProd = 0, maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
+    var prods = Array.isArray(d.produits) ? d.produits.slice(0, 500) : [];
+    for (var i = 0; i < prods.length; i++){
+      var p = prods[i]; var nm = cleanStr(p.nom, 80); var pr = parseFloat(p.prix);
+      if (!nm || !(pr >= 0)) continue;
+      var cat = ['grill','boisson','sucre'].indexOf(p.categorie) >= 0 ? p.categorie : 'grill';
+      var data = { name: nm, price: pr, cost: parseFloat(p.achat) || 0, category: cat, prep: !!p.prep, buvette: !!p.buvette, recap: cleanStr(p.recap, 80), active: p.actif !== false };
+      if (p.exemple) data.example = true;
+      var ex = idByName[normTxt(nm)];
+      if (ex){ await store.products.update(ex, data); }
+      else { data.order = ++maxOrder; idByName[normTxt(nm)] = await store.products.add(data); }
+      nProd++;
+    }
+    if (nProd) msgs.push(nProd + ' produits');
+    var nCard = 0, cards = Array.isArray(d.cartes) ? d.cartes.slice(0, 100) : [];
+    for (var k = 0; k < cards.length; k++){
+      var c = cards[k]; var cn = cleanStr(c.nom, 80); if (!cn) continue;
+      var items = [];
+      (Array.isArray(c.produits) ? c.produits : []).forEach(function(it){
+        var id = idByName[normTxt(it.nom)]; if (!id) return;
+        var pp = state.products.find(function(x){ return x.id === id; }) || {};
+        var price = parseFloat(it.prix); if (!(price >= 0)) price = pp.price || 0;
+        items.push({ productId: id, name: cleanStr(it.nom, 80), price: price, cost: pp.cost || 0, category: pp.category || 'grill', prep: !!pp.prep, recap: pp.recap || '' });
+      });
+      if (!items.length) continue;
+      var same = state.cartes.find(function(x){ return normTxt(x.name) === normTxt(cn); });
+      var cd = { name: cn, items: items, updatedAt: Date.now() }; if (c.exemple) cd.example = true;
+      if (same) await store.cartes.update(same.id, cd); else { cd.createdAt = Date.now(); await store.cartes.add(cd); }
+      nCard++;
+    }
+    if (nCard) msgs.push(nCard + ' cartes');
+    if (Array.isArray(d.adherents) && d.adherents.length){
+      var ra = parseAdherents(JSON.stringify(d.adherents));
+      if (ra.list){ await saveAdherents(ra.list); msgs.push(ra.list.length + ' adhérents'); }
+    }
+    showToast('Fichier chargé : ' + (msgs.join(', ') || 'rien à ajouter'));
+  }
+
+  // exemples (marqués TEST)
+  function renderExamples(){
+    var has = state.products.some(function(p){ return p.example; }) || state.cartes.some(function(c){ return c.example; });
+    var b1 = document.getElementById('btnExamples'), b2 = document.getElementById('btnExamplesDel'), i = document.getElementById('exInfo');
+    if (!b1) return;
+    b1.hidden = has; b2.hidden = !has;
+    i.textContent = has ? 'Des exemples « TEST » sont présents. Supprime-les quand tu as compris le principe.' : 'Pour voir comment ça marche : crée 3 produits « TEST » et une « Carte test ». Tu pourras les supprimer d\'un seul bouton.';
+  }
+  async function createExamples(){
+    var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
+    var defs = [{ name: 'TEST Boisson', price: 1.5, category: 'boisson', prep: false, buvette: true }, { name: 'TEST Sandwich', price: 3.5, category: 'grill', prep: true, buvette: false }, { name: 'TEST Gâteau', price: 2, category: 'sucre', prep: false, buvette: true }];
+    var items = [];
+    for (var i = 0; i < defs.length; i++){
+      var d = defs[i]; var data = { name: d.name, price: d.price, cost: 0, category: d.category, order: ++maxOrder, active: true, prep: d.prep, buvette: d.buvette, recap: d.prep ? 'Sandwichs' : '', example: true };
+      var id = await store.products.add(data);
+      items.push({ productId: id, name: d.name, price: d.price, cost: 0, category: d.category, prep: d.prep, recap: data.recap });
+    }
+    await store.cartes.add({ name: 'Carte test', items: items, example: true, createdAt: Date.now(), updatedAt: Date.now() });
+    showToast('Exemples créés : 3 produits TEST et une Carte test');
+  }
+  async function deleteExamples(){
+    var ps = state.products.filter(function(p){ return p.example; }), cs = state.cartes.filter(function(c){ return c.example; });
+    for (var i = 0; i < ps.length; i++) await store.products.remove(ps[i].id);
+    for (var j = 0; j < cs.length; j++) await store.cartes.remove(cs[j].id);
+    showToast('Exemples supprimés');
+  }
+
   // ---------- charte du club (nom, logo, couleurs) ----------
   function getClub(){
     var d = state.settings.find(function(x){ return x.id === 'club'; });
@@ -1921,8 +2153,12 @@
     var ink = lumOf(c1) > 0.4 ? '#1a1a1a' : '#ffffff';
     var txtL = lumOf(c1) > 0.3 ? (lumOf(c2) < 0.25 ? c2 : '#2C1F14') : c1;
     var txtD = lumOf(c1) < 0.25 ? mixHex(c1, '#ffffff', 0.5) : c1;
-    var light = '--accent:' + c1 + ';--accent-ink:' + ink + ';--accent-soft:' + mixHex(c1, '#ffffff', 0.8) + ';--accent-text:' + txtL + ';';
-    var dark = '--accent:' + c1 + ';--accent-ink:' + ink + ';--accent-soft:' + mixHex(c1, '#000000', 0.72) + ';--accent-text:' + txtD + ';';
+    var c2dark = lumOf(c2) < 0.25;
+    var light = '--accent:' + c1 + ';--accent-ink:' + ink + ';--accent-soft:' + mixHex(c1, '#ffffff', 0.8) + ';--accent-text:' + txtL + ';' +
+      '--bg:' + mixHex(c1, '#ffffff', 0.9) + ';--surface-2:' + mixHex(c1, '#ffffff', 0.84) + ';--line:' + mixHex(c1, '#ffffff', 0.55) + ';' +
+      (c2dark ? '--ink:' + c2 + ';--muted:' + mixHex(c2, '#ffffff', 0.4) + ';' : '');
+    var dark = '--accent:' + c1 + ';--accent-ink:' + ink + ';--accent-soft:' + mixHex(c1, '#000000', 0.72) + ';--accent-text:' + txtD + ';' +
+      '--bg:' + mixHex(c1, '#000000', 0.92) + ';--surface:' + mixHex(c1, '#000000', 0.87) + ';--surface-2:' + mixHex(c1, '#000000', 0.82) + ';--line:' + mixHex(c1, '#000000', 0.68) + ';--ink:#F4F1E6;--muted:' + mixHex(c1, '#ffffff', 0.35) + ';';
     st.textContent = ':root{' + light + '}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){' + dark + '}}:root[data-theme="dark"]{' + dark + '}';
     var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.setAttribute('content', c1);
   }
@@ -1964,7 +2200,8 @@
   function buvetteProducts(){ return state.products.filter(function(p){ return p.buvette && p.active !== false; }); }
   function renderCards(){
     var box = document.getElementById('cardsList'); if (!box) return;
-    document.getElementById('buvInfo').textContent = buvetteProducts().length + ' produit' + (buvetteProducts().length > 1 ? 's' : '') + ' dans la carte Buvette';
+    var bp = buvetteProducts();
+    document.getElementById('buvInfo').textContent = bp.length + ' produit' + (bp.length > 1 ? 's' : '') + ' dans la carte Buvette' + (bp.length ? ' : ' + bp.map(function(p){ return p.name + ' ' + fmtEUR.format(p.price); }).join(' · ') : '');
     var cards = state.cartes.slice().sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
     box.innerHTML = cards.map(function(c){
       return '<div class="prep-card" data-id="' + c.id + '"><div class="pc-name">' + escapeHtml(c.name) + '</div><div class="pc-sub">' + (c.items ? c.items.length : 0) + ' produits</div>' +
@@ -1983,23 +2220,50 @@
   }
   function renderCardRows(){
     var box = document.getElementById('cardRows');
+    var catName = { grill: 'Grillades / snack', boisson: 'Boissons', sucre: 'Sucré' };
     box.innerHTML = cardDraft.rows.map(function(r, i){
-      return '<div class="prep-row"><label><input type="checkbox" class="cd-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + '</label>' +
+      return '<div class="prep-row" data-n="' + escapeHtml(normTxt(r.name)) + '"><label><input type="checkbox" class="cd-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + ' <span class="muted" style="font-size:11px;">' + (catName[r.category] || '') + '</span></label>' +
         '<input type="number" class="cd-price" data-i="' + i + '" step="0.10" min="0" value="' + r.price + '"><span class="muted">€</span></div>';
-    }).join('') || '<div class="empty-hint">Le catalogue est vide : ajoute ou importe des produits d\'abord.</div>';
+    }).join('') || '<div class="empty-hint">Le catalogue est vide : ajoute un produit ci-dessus.</div>';
     box.querySelectorAll('.cd-chk').forEach(function(c){ c.onchange = function(){ cardDraft.rows[+c.getAttribute('data-i')].checked = c.checked; }; });
     box.querySelectorAll('.cd-price').forEach(function(c){ c.onchange = function(){ cardDraft.rows[+c.getAttribute('data-i')].price = parseFloat(c.value) || 0; }; });
   }
-  function openCardEditor(id){
+  function openCardEditor(id, mode){
     var card = id ? state.cartes.find(function(c){ return c.id === id; }) : null;
-    cardDraft = { id: id || null, rows: [] };
-    var inCard = {};
-    if (card && card.items) card.items.forEach(function(it){ inCard[it.productId] = true; cardDraft.rows.push({ productId: it.productId, name: it.name, category: it.category, prep: !!it.prep, recap: it.recap || '', cost: it.cost || 0, checked: true, price: it.price }); });
-    state.products.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).forEach(function(p){ if (!inCard[p.id]) cardDraft.rows.push(rowFromProduct(p, !card ? false : false)); });
-    document.getElementById('cardTitle').textContent = card ? 'Modifier la carte' : 'Nouvelle carte';
+    var isBuv = mode === 'buvette';
+    cardDraft = { id: id || null, mode: isBuv ? 'buvette' : 'card', rows: [] };
+    var catRank = { grill: 0, boisson: 1, sucre: 2 };
+    var byName = function(a,b){ return ((catRank[a.category] || 0) - (catRank[b.category] || 0)) || String(a.name).localeCompare(String(b.name)); };
+    if (isBuv){
+      var all = state.products.slice().sort(byName);
+      all.filter(function(p){ return p.buvette; }).concat(all.filter(function(p){ return !p.buvette; })).forEach(function(p){ var r = rowFromProduct(p, false); r.checked = !!p.buvette; r.price = p.price; cardDraft.rows.push(r); });
+    } else {
+      var inCard = {};
+      if (card && card.items) card.items.forEach(function(it){ inCard[it.productId] = true; cardDraft.rows.push({ productId: it.productId, name: it.name, category: it.category, prep: !!it.prep, recap: it.recap || '', cost: it.cost || 0, checked: true, price: it.price }); });
+      state.products.slice().sort(byName).forEach(function(p){ if (!inCard[p.id]) cardDraft.rows.push(rowFromProduct(p, false)); });
+    }
+    document.getElementById('cardTitle').textContent = isBuv ? 'Carte Buvette' : (card ? 'Modifier la carte' : 'Nouvelle carte');
+    document.getElementById('cardNameWrap').hidden = isBuv;
+    document.getElementById('cardHelp').textContent = isBuv ? 'Coche les produits vendus à la buvette et règle leurs prix. Les produits décochés restent dans le catalogue.' : 'Coche les produits de cette carte et règle leurs prix.';
     document.getElementById('inpCardName').value = card ? card.name : '';
+    document.getElementById('edSearch').value = '';
+    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = '';
     renderCardRows();
     document.getElementById('overlayCard').hidden = false;
+  }
+  async function addProductInEditor(){
+    var name = document.getElementById('edNewName').value.trim();
+    if (!name){ document.getElementById('edNewName').focus(); return; }
+    var price = parseFloat(document.getElementById('edNewPrice').value) || 0;
+    var cat = document.getElementById('edNewCat').value;
+    var same = state.products.find(function(p){ return normTxt(p.name) === normTxt(name); });
+    if (same){ showToast('« ' + same.name + ' » existe déjà dans le catalogue : coche-le dans la liste'); document.getElementById('edSearch').value = name; document.getElementById('edSearch').dispatchEvent(new Event('input')); return; }
+    var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
+    var prep = cat === 'grill';
+    var newId = await store.products.add({ name: name, price: price, cost: 0, category: cat, order: maxOrder + 1, active: true, prep: prep, buvette: cardDraft.mode === 'buvette', recap: '' });
+    cardDraft.rows.unshift({ productId: newId, name: name, category: cat, prep: prep, recap: '', cost: 0, checked: true, price: price, isNew: true });
+    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = '';
+    renderCardRows(); showToast('« ' + name + ' » ajouté au catalogue et à cette carte');
   }
   function itemsFromRows(rows){
     return rows.filter(function(r){ return r.checked; }).map(function(r){ return { productId: r.productId, name: r.name, price: r.price, cost: r.cost, category: r.category, prep: r.prep, recap: r.recap }; });
@@ -2253,8 +2517,23 @@
     document.getElementById('btnImportBuv').addEventListener('click', function(){ openImport('buvette'); });
     document.getElementById('btnImportCard').addEventListener('click', function(){ openImport('card'); });
     document.getElementById('btnNewCard').addEventListener('click', function(){ openCardEditor(null); });
+    document.getElementById('btnEditBuv').addEventListener('click', function(){ openCardEditor(null, 'buvette'); });
+    document.getElementById('catSearch').addEventListener('input', function(){ renderProduits(); });
+    document.getElementById('edSearch').addEventListener('input', function(){ var q = normTxt(this.value); document.querySelectorAll('#cardRows .prep-row').forEach(function(r){ r.hidden = !!q && r.getAttribute('data-n').indexOf(q) < 0; }); });
+    document.getElementById('btnEdNew').addEventListener('click', addProductInEditor);
     document.getElementById('btnCardCancel').addEventListener('click', function(){ document.getElementById('overlayCard').hidden = true; });
     document.getElementById('btnCardSave').addEventListener('click', async function(){
+      if (cardDraft.mode === 'buvette'){
+        for (var bi = 0; bi < cardDraft.rows.length; bi++){
+          var br = cardDraft.rows[bi], bp = state.products.find(function(p){ return p.id === br.productId; });
+          if (!bp) continue;
+          var upd = {};
+          if (!!bp.buvette !== !!br.checked) upd.buvette = !!br.checked;
+          if (br.checked && bp.price !== br.price) upd.price = br.price;
+          if (Object.keys(upd).length) await store.products.update(bp.id, upd);
+        }
+        document.getElementById('overlayCard').hidden = true; showToast('Carte Buvette enregistrée'); return;
+      }
       var name = document.getElementById('inpCardName').value.trim();
       if (!name){ document.getElementById('inpCardName').focus(); return; }
       var items = itemsFromRows(cardDraft.rows);
@@ -2315,15 +2594,26 @@
     document.getElementById('btnClubLoad').addEventListener('click', function(){ requireCode(function(){ document.getElementById('fileClub').value = ''; document.getElementById('fileClub').click(); }); });
     document.getElementById('fileClub').addEventListener('change', function(){ var f = this.files && this.files[0]; if (f) loadClubFile(f); });
     document.getElementById('btnClubClear').addEventListener('click', function(){ requireCode(async function(){ try { localStorage.removeItem('ccbb_club'); } catch(e){} await store.settings.remove('club'); state.settings = state.settings.filter(function(x){ return x.id !== 'club'; }); applyClub(); renderClubInfo(); showToast('Charte retirée'); }); });
+    document.getElementById('btnWhoChange').addEventListener('click', openWho);
+    document.getElementById('inpWho').addEventListener('input', renderWhoList);
+    document.getElementById('btnWhoSkip').addEventListener('click', function(){ try { sessionStorage.setItem('ccbb_who_skip', '1'); } catch(e){} document.getElementById('overlayWho').hidden = true; });
+    document.getElementById('btnAdhLoad').addEventListener('click', function(){ requireCode(function(){ document.getElementById('fileAdh').value = ''; document.getElementById('fileAdh').click(); }); });
+    document.getElementById('fileAdh').addEventListener('change', async function(){ var f = this.files && this.files[0]; if (!f) return; var r = parseAdherents(await f.text()); if (r.error){ showToast(r.error); return; } await saveAdherents(r.list); showToast('Liste chargée : ' + r.list.length + ' personnes'); });
+    document.getElementById('btnAdhClear').addEventListener('click', function(){ requireCode(async function(){ try { localStorage.removeItem('ccbb_adh'); } catch(e){} await store.settings.remove('adherents'); state.settings = state.settings.filter(function(x){ return x.id !== 'adherents'; }); renderWho(); showToast('Liste retirée'); }); });
+    document.getElementById('btnStartLoad').addEventListener('click', function(){ requireCode(function(){ document.getElementById('fileStart').value = ''; document.getElementById('fileStart').click(); }); });
+    document.getElementById('fileStart').addEventListener('change', function(){ var f = this.files && this.files[0]; if (f) loadStart(f); });
+    document.getElementById('btnStartExport').addEventListener('click', function(){ requireCode(exportStart); });
+    document.getElementById('btnExamples').addEventListener('click', createExamples);
+    document.getElementById('btnExamplesDel').addEventListener('click', deleteExamples);
     document.getElementById('btnReglages').addEventListener('click', function(){
       state.mode = null; state.view = 'reglages'; cart = [];
       var v = ''; try { v = localStorage.getItem('ccbb_prenom') || ''; } catch(e){}
       document.getElementById('inpPrenom').value = v;
       document.getElementById('chkRemember').checked = rememberOn();
       document.getElementById('infoApp').textContent = APP_VERSION + ' · ' + (store && store.kind === 'firebase' ? 'synchronisée avec le serveur' : 'mode local (non synchronisée)');
-      renderClubInfo(); toggleViews(); render();
+      renderClubInfo(); renderWho(); toggleViews(); render();
     });
-    document.getElementById('inpPrenom').addEventListener('change', function(){ try { localStorage.setItem('ccbb_prenom', this.value.trim()); } catch(e){} showToast('Prénom enregistré'); });
+    document.getElementById('inpPrenom').addEventListener('change', function(){ try { localStorage.setItem('ccbb_prenom', this.value.trim()); localStorage.removeItem('ccbb_who'); } catch(e){} renderWho(); showToast('Prénom enregistré'); });
     document.getElementById('chkRemember').addEventListener('change', function(){ try { localStorage.setItem('ccbb_remember', this.checked ? '1' : '0'); if (!this.checked) localStorage.removeItem('ccbb_last'); } catch(e){} });
     document.getElementById('btnModeBuvette').addEventListener('click', function(){ enterMode('buvette'); });
     document.getElementById('btnModeEvent').addEventListener('click', function(){ enterMode('event'); });
@@ -2469,7 +2759,7 @@
     store.events.onChange(function(list){ state.events = list; render(); });
     store.orders.onChange(function(list){ state.orders = list; checkNewKitchenOrders(); render(); });
     store.services.onChange(function(list){ state.services = list; render(); });
-    store.settings.onChange(function(list){ state.settings = list; var cl = list.find(function(x){ return x.id === 'club'; }); try { if (cl) localStorage.setItem('ccbb_club', JSON.stringify(cl)); else if (state.settingsLoaded) localStorage.removeItem('ccbb_club'); } catch(e){} state.settingsLoaded = true; applyClub(); renderClubInfo(); });
+    store.settings.onChange(function(list){ state.settings = list; var cl = list.find(function(x){ return x.id === 'club'; }); try { if (cl) localStorage.setItem('ccbb_club', JSON.stringify(cl)); else if (state.settingsLoaded) localStorage.removeItem('ccbb_club'); } catch(e){} state.settingsLoaded = true; applyClub(); renderClubInfo(); try { var ad = list.find(function(x){ return x.id === 'adherents'; }); if (ad && ad.list) localStorage.setItem('ccbb_adh', JSON.stringify(ad.list)); } catch(e){} renderWho(); maybeAskWho(); });
     store.cartes.onChange(function(list){ state.cartes = list; if (state.view === 'produits') render(); });
     // amorçage des produits sans bloquer l'écran (hors-ligne, la lecture serveur échoue : on attend la prochaine ouverture)
     Promise.resolve().then(migrateProductsIfNeeded).catch(function(e){ console.warn('[caisse-ccbb] amorçage reporté', e && e.message); });
@@ -2482,7 +2772,7 @@
       var last = null; try { last = localStorage.getItem('ccbb_last'); } catch(e){}
       if (last === 'buvette' || last === 'event') state.mode = last, state.view = 'vente';
     }
-    applyClub(); renderClubInfo();
+    applyClub(); renderClubInfo(); renderWho();
     toggleViews();
     render();
   }
