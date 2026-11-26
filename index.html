@@ -252,6 +252,8 @@
   .prep-card .pc-actions{ display:flex; gap:8px; }
   .net-pill{ font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
   .net-pill.off{ color:#b3261e; border-color:#b3261e; background:#fdecea; }
+  .app-ver{ text-align:center; font-size:11px; color:var(--muted); opacity:.7; padding:18px 0 130px; }
+  #app.is-home .app-ver{ padding-bottom:30px; }
   .svc-bar{ margin-top:10px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; font-size:13px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
 
   .mode-banner{ background:var(--accent-soft, #FBE3D6); color:var(--accent); border-bottom:1px solid var(--accent); padding:7px 16px; font-size:13px; font-weight:600; text-align:center; }
@@ -395,6 +397,10 @@
     <div id="productsList"></div>
     <button class="btn btn-accent btn-block" id="btnAddProduct" style="margin-top:6px;">+ Ajouter un produit</button>
 
+    <div class="section-label">Importer une liste de produits</div>
+    <div class="product-row"><div class="muted" style="font-size:12px;margin-bottom:8px;">Colle une liste (une ligne par produit) au lieu de tout saisir à la main. Fonctionne aussi avec un copier-coller depuis un tableur.</div>
+    <button class="btn btn-outline btn-sm" id="btnImport" type="button">Importer une liste</button></div>
+
     <div class="section-label">Code responsable</div>
     <div class="product-row"><div class="muted" style="font-size:12px;margin-bottom:8px;">Protège cet onglet, le fond de caisse et le bilan. À donner seulement aux responsables, jamais aux parents de la buvette.</div>
     <button class="btn btn-outline btn-sm" id="btnChangeCode" type="button">Changer le code</button></div>
@@ -414,6 +420,7 @@
     </div>
   </main>
 
+  <div class="app-ver" id="appVer"></div>
   <div class="bottom-stack">
     <div class="cart-bar" id="cartBar" hidden>
       <div class="cart-bar-inner">
@@ -453,6 +460,18 @@
   </div>
 </div>
 
+<div class="overlay" id="overlayImport" hidden>
+  <div class="sheet" style="max-height:92vh;overflow:auto;">
+    <h2>Importer une liste de produits</h2>
+    <div class="muted" style="font-size:12px;margin-bottom:8px;">Une ligne par produit, avec des points-virgules (ou des tabulations) :<br><b>Nom ; prix de vente ; prix d'achat ; catégorie ; cuisine ; buvette</b><br>Seuls le nom et le prix de vente sont obligatoires. Catégorie : boisson, sucré ou snack. Cuisine et buvette : oui ou non. Exemple : <i>Cannette soft ; 2 ; ; boisson</i></div>
+    <button class="btn btn-ghost btn-sm" id="btnImportExample" type="button">Remplir avec la liste de la buvette du club</button>
+    <textarea id="impText" rows="9" style="width:100%;margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font:13px/1.4 ui-monospace,Menlo,monospace;" placeholder="Cannette soft ; 2 ; ; boisson&#10;Gaufre ; 2,5 ; 0,8 ; sucré"></textarea>
+    <label style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px;"><input type="checkbox" id="impBuv" checked> Vendus à la buvette (sauf indication contraire sur la ligne)</label>
+    <button class="btn btn-outline btn-block" id="btnImportPreview" type="button">Voir l'aperçu</button>
+    <div id="impPreview" style="margin-top:10px;font-size:13px;"></div>
+    <div class="sheet-actions" style="margin-top:12px;"><button class="btn btn-outline" id="btnImportCancel" type="button">Fermer</button><button class="btn btn-accent" id="btnImportGo" type="button" hidden>Importer</button></div>
+  </div>
+</div>
 <div class="overlay" id="overlayCode" hidden>
   <div class="sheet">
     <h2 id="codeTitle">Code responsable</h2>
@@ -760,6 +779,7 @@
 
   // ---------- app state ----------
   var store = null;
+  var APP_VERSION = 'Caisse Buvette CCBB · v5.0 · 26/11/2026';
   var state = { products: [], events: [], orders: [], services: [], settings: [], view: 'accueil', mode: null, detailEventId: null, seeded: false };
   var cart = []; // [{ productId, name, category, prep, unitPrice, unitCost, qty }]
   var lastFlashId = null;
@@ -1792,6 +1812,91 @@
     document.getElementById('view-produits').hidden = state.view !== 'produits';
   }
 
+  // ---------- import d'une liste de produits ----------
+  var IMPORT_EXAMPLE = [
+    'Cannette soft ; 2 ; ; boisson',
+    'Jus de fruits ; 2 ; ; boisson',
+    "Bouteille d'eau ; 1 ; ; boisson",
+    'Café / thé / chocolat ; 1 ; ; boisson',
+    'Bière cannette ; 2 ; ; boisson',
+    'Bière pression / Desperados ; 2,5 ; ; boisson',
+    'Verre de vin ; 1,5 ; ; boisson',
+    "Coca / Orangina / Oasis / Lipton au verre ; 1,5 ; ; boisson",
+    "Bonbons / chips / M&M's ; 1 ; ; sucré",
+    'Gourmandises ; 2 ; ; sucré',
+    'Gaufre / crêpe Nutella ; 2,5 ; ; sucré',
+    'Gaufre / crêpe sucre ; 2 ; ; sucré'
+  ].join('\n');
+  function normTxt(t){ return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+  function parseNum(t){ var v = parseFloat(String(t == null ? '' : t).replace(/\s/g, '').replace('€', '').replace(',', '.')); return isNaN(v) ? null : v; }
+  function parseCat(t){
+    var n = normTxt(t);
+    if (!n) return null;
+    if (n.indexOf('boiss') === 0 || n === 'soft' || n === 'bar') return 'boisson';
+    if (n.indexOf('sucr') === 0 || n.indexOf('dessert') === 0 || n.indexOf('confis') === 0) return 'sucre';
+    if (n.indexOf('snack') === 0 || n.indexOf('grill') === 0 || n.indexOf('plat') === 0 || n.indexOf('cuisine') === 0) return 'grill';
+    return null;
+  }
+  function parseYesNo(t){ var n = normTxt(t); if (n === 'oui' || n === 'o' || n === 'x' || n === '1' || n === 'yes') return true; if (n === 'non' || n === 'n' || n === '0' || n === 'no') return false; return null; }
+  function parseImport(text, allBuv){
+    var out = { items: [], skipped: [] };
+    text.split(/\r?\n/).forEach(function(line){
+      if (!line.trim()) return;
+      var f = line.indexOf('\t') >= 0 ? line.split('\t') : line.split(';');
+      f = f.map(function(x){ return x.trim(); });
+      var price = parseNum(f[1]);
+      if (!f[0] || price === null || price < 0){ out.skipped.push(line.trim()); return; }
+      var cat = parseCat(f[3]);
+      var cuis = parseYesNo(f[4]);
+      var buv = parseYesNo(f[5]);
+      out.items.push({ name: f[0], price: round2(price), cost: f[2] ? round2(parseNum(f[2]) || 0) : null, category: cat, prep: cuis === true, buvette: buv === null ? !!allBuv : buv });
+    });
+    return out;
+  }
+  var importParsed = null;
+  function importPreview(){
+    var r = parseImport(document.getElementById('impText').value, document.getElementById('impBuv').checked);
+    importParsed = r;
+    var box = document.getElementById('impPreview');
+    var catLabel = { boisson: 'boisson', sucre: 'sucré', grill: 'snack' };
+    var html = r.items.map(function(it){
+      var ex = state.products.find(function(p){ return normTxt(p.name) === normTxt(it.name); });
+      it.existingId = ex ? ex.id : null;
+      return '<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--line);"><span>' + escapeHtml(it.name) + ' <span class="muted">(' + (it.category ? catLabel[it.category] : (ex ? (catLabel[ex.category] || 'snack') : 'snack')) + (it.buvette ? ', buvette' : '') + (it.prep ? ', cuisine' : '') + ')</span></span><b>' + fmtEUR.format(it.price) + '</b><span class="muted">' + (ex ? 'mise à jour' : 'nouveau') + '</span></div>';
+    }).join('');
+    if (r.skipped.length) html += '<div class="muted" style="margin-top:6px;">Lignes ignorées (prix manquant ou illisible) : ' + r.skipped.map(escapeHtml).join(' | ') + '</div>';
+    if (!r.items.length) html = '<div class="muted">Rien à importer : vérifie qu\'il y a un nom et un prix sur chaque ligne.</div>';
+    box.innerHTML = html;
+    var go = document.getElementById('btnImportGo');
+    go.hidden = !r.items.length;
+    go.textContent = 'Importer ' + r.items.length + ' produit' + (r.items.length > 1 ? 's' : '');
+  }
+  async function importGo(){
+    if (!importParsed || !importParsed.items.length) return;
+    var go = document.getElementById('btnImportGo'); go.disabled = true;
+    var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order || 0); }, -1);
+    var created = [], updated = 0;
+    for (var i = 0; i < importParsed.items.length; i++){
+      var it = importParsed.items[i];
+      if (it.existingId){
+        var upd = { price: it.price };
+        if (it.category) upd.category = it.category;
+        if (it.cost !== null) upd.cost = it.cost;
+        if (it.buvette) upd.buvette = true;
+        await store.products.update(it.existingId, upd); updated++;
+      } else {
+        var pr = { name: it.name, price: it.price, cost: it.cost || 0, category: it.category || 'grill', order: ++maxOrder, active: true, prep: it.prep, buvette: it.buvette, recap: '' };
+        var id = await store.products.add(pr);
+        created.push({ productId: id, name: it.name, price: it.price, cost: it.cost || 0, category: it.category || 'grill', prep: it.prep, recap: '' });
+      }
+    }
+    var oe = state.events.find(function(e){ return e.status === 'open' && e.type !== 'buvette' && e.items; });
+    if (oe && created.length) store.events.update(oe.id, { items: oe.items.concat(created) });
+    go.disabled = false;
+    document.getElementById('overlayImport').hidden = true;
+    showToast(created.length + ' ajouté' + (created.length > 1 ? 's' : '') + (updated ? ', ' + updated + ' mis à jour' : ''));
+  }
+
   // ---------- code responsable (barrière contre les fausses manips, pas une vraie sécurité) ----------
   var unlockedUntil = 0;
   function getCode(){ var d = state.settings.find(function(x){ return x.id === 'code'; }); return d && d.code ? String(d.code) : null; }
@@ -1915,6 +2020,11 @@
     selPoste.addEventListener('change', function(){ setPoste(selPoste.value); });
     document.getElementById('tabHistorique').addEventListener('click', function(){ state.view='historique'; toggleViews(); render(); });
     document.getElementById('tabProduits').addEventListener('click', function(){ requireCode(function(){ state.view='produits'; toggleViews(); render(); }); });
+    document.getElementById('btnImport').addEventListener('click', function(){ document.getElementById('impText').value = ''; document.getElementById('impPreview').innerHTML = ''; document.getElementById('btnImportGo').hidden = true; document.getElementById('overlayImport').hidden = false; });
+    document.getElementById('btnImportExample').addEventListener('click', function(){ document.getElementById('impText').value = IMPORT_EXAMPLE; importPreview(); });
+    document.getElementById('btnImportPreview').addEventListener('click', importPreview);
+    document.getElementById('btnImportGo').addEventListener('click', importGo);
+    document.getElementById('btnImportCancel').addEventListener('click', function(){ document.getElementById('overlayImport').hidden = true; });
     document.getElementById('btnCodeOk').addEventListener('click', submitCode);
     document.getElementById('inpCode2').addEventListener('keydown', function(e){ if (e.key === 'Enter') submitCode(); });
     document.getElementById('inpCode').addEventListener('keydown', function(e){ if (e.key === 'Enter' && document.getElementById('codeConfirmWrap').hidden) submitCode(); });
@@ -1939,6 +2049,7 @@
     document.getElementById('btnBackDetail').addEventListener('click', function(){ state.view='historique'; toggleViews(); render(); });
 
     document.getElementById('btnUndo').addEventListener('click', undoLast);
+    document.getElementById('appVer').textContent = APP_VERSION;
     window.addEventListener('online', renderNet); window.addEventListener('offline', renderNet); renderNet();
     document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') keepAwake(); });
     document.addEventListener('click', function(){ unlockAudio(); keepAwake(); }, { passive: true });
