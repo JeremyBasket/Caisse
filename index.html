@@ -56,7 +56,7 @@
   .tabular{ font-variant-numeric: tabular-nums; }
   button{ font-family:inherit; }
 
-  header.top{ position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--bg); padding-block:14px 10px; border-bottom:1px solid var(--line); }
+  header.top{ position:static; z-index:20; background:var(--bg); padding-block:14px 10px; border-bottom:1px solid var(--line); }
   .eyebrow{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600; }
   .event-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-top:2px; }
   .event-name{ font-size:19px; line-height:1.2; }
@@ -99,6 +99,25 @@
   .tile .tprice{ margin-top:auto; font-size:13px; color:var(--muted); font-weight:600; }
   .tile.cat-grill .icon-wrap{ background:color-mix(in srgb, var(--grill) 16%, transparent); color:var(--grill); }
   .tile.cat-boisson .icon-wrap{ background:color-mix(in srgb, var(--boisson) 16%, transparent); color:var(--boisson); }
+  .tile.cat-entree .icon-wrap{ background:color-mix(in srgb, #6FAF5A 18%, transparent); color:#5B9A47; }
+  .tile.cat-plat .icon-wrap{ background:color-mix(in srgb, #D8A13A 18%, transparent); color:#B8841F; }
+  .tile.cat-formule .icon-wrap{ background:var(--accent-soft); color:var(--accent-text,var(--accent)); }
+  .tile .tname{ display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+  .svc-bar{ flex-wrap:wrap; }
+  .row-meta{ font-size:11px; color:var(--muted); display:flex; gap:10px; align-items:center; margin:2px 0 0 26px; flex-wrap:wrap; }
+  .prep-row .row-meta label{ flex:none; font-size:11px; gap:4px; }
+  .prep-row .rm-main{ flex:1; min-width:0; }
+  .prep-row .rm-main > label{ font-size:14px; }
+  #overlayWho{ align-items:stretch; background:var(--bg); }
+  #overlayWho .sheet{ max-width:560px; max-height:none; height:100%; border-radius:0; box-shadow:none; padding-top:max(24px, env(safe-area-inset-top,0px)); }
+  #overlayWho h2{ font-size:26px; }
+  #inpWho{ font-size:20px !important; padding:16px !important; }
+  .home-who-btn{ display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:14px; padding:12px 14px; font:inherit; font-size:15px; cursor:pointer; margin:2px 0 12px; text-align:left; }
+  .home-who-btn.todo{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700; font-size:17px; padding:16px; }
+  .seg{ display:flex; gap:6px; margin:6px 0 12px; }
+  .seg button{ flex:1; padding:10px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; font-weight:600; cursor:pointer; }
+  .seg button.on{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .sub-comp{ display:block; font-size:10.5px; color:var(--muted); font-weight:500; margin-top:2px; }
   .tile.cat-sucre .icon-wrap{ background:color-mix(in srgb, var(--sucre) 16%, transparent); color:var(--sucre); }
   .tile .tap-count{ position:absolute; top:-6px; right:-6px; background:var(--accent); color:var(--accent-ink); font-size:11px; font-weight:700; min-width:20px; height:20px; border-radius:999px; display:flex;align-items:center;justify-content:center; padding:0 5px; box-shadow:0 2px 5px rgba(0,0,0,.2); }
 
@@ -278,7 +297,7 @@
 
 <div id="app">
   </head><body style="margin:0">
-<div class="mode-banner" id="modeBanner" hidden></div>
+  <div class="mode-banner" id="modeBanner" hidden></div>
   <header class="top">
     <div style="display:flex;justify-content:space-between;align-items:center;"><button class="home-link" id="btnHome" type="button">← Accueil</button><span class="net-pill" id="netPill">En ligne</span></div>
     <div class="eyebrow" id="hdrEyebrow">Caisse</div>
@@ -304,18 +323,20 @@
       <div class="eyebrow" id="homeEyebrow">Caisse</div>
       <h1 class="display">Caisse</h1>
       <div id="homeWho" class="muted" style="font-size:13px;margin:-2px 0 10px;" hidden></div>
-      <button class="home-btn primary" id="btnModeBuvette" type="button"><strong>Buvette</strong><span>Vente simple, sans cuisine. S'ouvre toute seule à la première vente et se ferme à minuit.</span></button>
+      <button class="home-btn primary" id="btnModeBuvette" type="button"><strong>Buvette</strong><span>Vente simple, sans cuisine. S'ouvre à la première vente, se ferme seule à 2 h du matin ou avec le bouton « Clore la buvette ».</span></button>
       <button class="home-btn" id="btnModeEvent" type="button"><strong>Événement</strong><span>Soirée, match, tournoi : cuisine, remise, produits.</span></button>
       <button class="home-btn" id="btnModeProduits" type="button"><strong>Produits &amp; cartes</strong><span>Catalogue, prix, import des listes. Protégé par le code responsable.</span></button>
+      <button class="home-btn" id="btnModeBilan" type="button"><strong>Bilans</strong><span>Chiffres de la saison, événements d'un côté, buvette de l'autre. Protégé par le code responsable.</span></button>
       <button class="home-thin" id="btnReglages" type="button">Réglages</button>
     </div>
   </main>
 
   <main id="view-vente">
     <div id="ventEmpty" class="empty-card" hidden>
-      <h2 class="display">Aucun événement en cours</h2>
-      <p>Crée un événement (soirée, match, tournoi) pour ouvrir la caisse et commencer à enregistrer les commandes.</p>
+      <h2 class="display" id="ventEmptyTitle">Aucun événement en cours</h2>
+      <p id="ventEmptyText">Crée un événement (soirée, match, tournoi) pour ouvrir la caisse et commencer à enregistrer les commandes.</p>
       <button class="btn btn-accent" id="btnNewEventEmpty">Préparer ou démarrer un événement</button>
+      <button class="btn btn-accent" id="btnBuvReopen" type="button" hidden>Rouvrir la buvette</button>
       <div id="preparedList" style="text-align:left;margin-top:18px;"></div>
     </div>
 
@@ -362,11 +383,14 @@
   </main>
 
   <main id="view-historique" hidden>
-    <div class="section-label" style="margin-top:4px;">Saison en cours</div>
+    <button class="home-link solo-back" id="btnHomeB" type="button">← Accueil</button>
+    <h2 class="display" style="font-size:22px;margin:4px 0 0;">Bilans de la saison</h2>
+    <div class="seg"><button id="segEvent" type="button" class="on">Événements</button><button id="segBuv" type="button">Buvette</button></div>
+    <div class="section-label" id="bilanLabel" style="margin-top:4px;">Événements : saison en cours</div>
     <div class="stat-grid" id="seasonStats"></div>
 
     <div class="chart-card" id="chartCard">
-      <h3>Chiffre d'affaires par événement</h3>
+      <h3 id="chartTitle">Chiffre d'affaires par événement</h3>
       <div id="chartBars"></div>
     </div>
 
@@ -559,10 +583,13 @@
     <input type="search" id="edSearch" placeholder="Chercher un produit" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;margin-bottom:8px;background:var(--surface);color:var(--ink);">
     <div class="product-row" style="margin-bottom:10px;">
       <div style="font-weight:600;font-size:13px;margin-bottom:6px;">Un produit qui n'existe pas encore ?</div>
+      <button class="btn btn-outline btn-sm" id="btnEdFormule" type="button" style="margin-bottom:8px;">+ Créer une formule (menu)</button>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
         <input type="text" id="edNewName" placeholder="Nom (ex. Tartiflette)" style="flex:2 1 140px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);">
         <input type="number" id="edNewPrice" placeholder="Prix €" step="0.10" min="0" style="flex:1 1 70px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);">
-        <select id="edNewCat" style="flex:1 1 110px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);"><option value="grill">Grillades / snack</option><option value="boisson">Boissons</option><option value="sucre">Sucré</option></select>
+        <input type="number" id="edNewCost" placeholder="Achat € (facultatif)" step="0.05" min="0" style="flex:1 1 110px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);">
+        <select id="edNewCat" style="flex:1 1 130px;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink);"></select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;flex:1 1 120px;"><input type="checkbox" id="edNewPrep" checked> Va en cuisine</label>
         <button class="btn btn-accent btn-sm" id="btnEdNew" type="button">Ajouter</button>
       </div>
     </div>
@@ -570,11 +597,24 @@
     <div class="sheet-actions" style="margin-top:14px;"><button class="btn btn-outline" id="btnCardCancel" type="button">Annuler</button><button class="btn btn-accent" id="btnCardSave" type="button">Enregistrer la carte</button></div>
   </div>
 </div>
+<div class="overlay" id="overlayFormule" hidden>
+  <div class="sheet" style="max-height:92vh;overflow:auto;">
+    <h2>Nouvelle formule</h2>
+    <div class="muted" style="font-size:12px;margin-bottom:10px;">Une formule regroupe plusieurs produits à un prix global (en général moins cher que la somme). Chaque produit reste compté à part en cuisine.</div>
+    <div class="field"><label for="fmName">Nom de la formule</label><input type="text" id="fmName" placeholder="ex. Formule tartiflette"></div>
+    <div class="field"><label for="fmPrice">Prix de la formule (€)</label><input type="number" id="fmPrice" step="0.10" min="0"></div>
+    <div class="section-label" style="margin-top:0;">Ce qu'il y a dedans</div>
+    <input type="search" id="fmSearch" placeholder="Chercher un produit" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;margin-bottom:8px;background:var(--surface);color:var(--ink);">
+    <div id="fmList"></div>
+    <div class="muted" id="fmSum" style="font-size:13px;margin:8px 0;"></div>
+    <div class="sheet-actions"><button class="btn btn-outline" id="btnFmCancel" type="button">Annuler</button><button class="btn btn-accent" id="btnFmSave" type="button">Créer la formule</button></div>
+  </div>
+</div>
 <div class="overlay" id="overlayImport" hidden>
   <div class="sheet" style="max-height:92vh;overflow:auto;">
     <h2 id="impTitle">Importer une liste de produits</h2>
     <div class="field" id="impCardWrap" hidden><label for="impCardName">Nom de la carte</label><input type="text" id="impCardName" placeholder="ex. Soirée saucisse-frites"></div>
-    <div class="muted" style="font-size:12px;margin-bottom:8px;">Une ligne par produit, avec des points-virgules (ou des tabulations) :<br><b>Nom ; prix de vente ; prix d'achat ; catégorie ; cuisine ; buvette</b><br>Seuls le nom et le prix de vente sont obligatoires. Catégorie : boisson, sucré ou snack. Cuisine et buvette : oui ou non. Exemple : <i>Cannette soft ; 2 ; ; boisson</i></div>
+    <div class="muted" style="font-size:12px;margin-bottom:8px;">Une ligne par produit, avec des points-virgules (ou des tabulations) :<br><b>Nom ; prix de vente ; prix d'achat ; catégorie ; cuisine ; buvette</b><br>Seuls le nom et le prix de vente sont obligatoires. Catégorie : entrée, plat, snack, sucré ou boisson. Cuisine et buvette : oui ou non. Exemple : <i>Cannette soft ; 2 ; ; boisson</i></div>
     <button class="btn btn-ghost btn-sm" id="btnImportExample" type="button">Remplir avec la liste de la buvette du club</button>
     <textarea id="impText" rows="9" style="width:100%;margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font:13px/1.4 ui-monospace,Menlo,monospace;" placeholder="Cannette soft ; 2 ; ; boisson&#10;Gaufre ; 2,5 ; 0,8 ; sucré"></textarea>
     <label id="impBuvWrap" style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px;"><input type="checkbox" id="impBuv"> Vendus à la buvette (sauf indication contraire sur la ligne)</label>
@@ -638,17 +678,23 @@
       <label for="inpEventPlace">Lieu</label>
       <input type="text" id="inpEventPlace" placeholder="Salle, terrain…">
     </div>
+    <div class="field">
+      <label for="inpEventFloat">Fond de caisse de départ (€, facultatif)</label>
+      <input type="number" id="inpEventFloat" step="0.5" min="0" placeholder="ex. 50">
+      <div class="muted" style="font-size:12px;margin-top:4px;">La somme en espèces mise dans la caisse avant la première vente. Elle est datée. Tu peux aussi la saisir ou la corriger plus tard.</div>
+    </div>
     <div class="field" id="prepCopyWrap">
       <label for="selPrepCopy">Partir d'une carte ou d'un événement passé</label>
       <select id="selPrepCopy" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font:inherit;"></select>
     </div>
     <div class="section-label" style="margin-top:4px;">Produits et prix de cet événement</div>
     <div id="prepList"></div>
-    <button class="btn btn-ghost btn-sm" id="btnPrepNew" type="button" style="margin-top:8px;">+ Nouvel article</button>
+    <button class="btn btn-ghost btn-sm" id="btnPrepNew" type="button" style="margin-top:8px;">+ Nouvel article</button> <button class="btn btn-ghost btn-sm" id="btnPrepFormule" type="button" style="margin-top:8px;">+ Formule</button>
     <div class="prep-card" id="prepNewForm" hidden>
       <div class="field"><label for="prepNewName">Nom du nouvel article</label><input type="text" id="prepNewName" placeholder="ex. Assiette moules-frites"></div>
       <div class="field"><label for="prepNewPrice">Prix de vente (€)</label><input type="number" id="prepNewPrice" step="0.10" min="0"></div>
-      <div class="field"><label for="prepNewCat">Catégorie</label><select id="prepNewCat" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font:inherit;"><option value="grill">Grillades / snack</option><option value="boisson">Boissons</option><option value="sucre">Sucré</option></select></div>
+      <div class="field"><label for="prepNewCost">Prix d'achat (€, facultatif)</label><input type="number" id="prepNewCost" step="0.05" min="0"></div>
+      <div class="field"><label for="prepNewCat">Catégorie</label><select id="prepNewCat" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font:inherit;"></select></div>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><input type="checkbox" id="prepNewPrep" checked> Nécessite une préparation cuisine</label>
       <div class="sheet-actions"><button class="btn btn-outline" id="btnPrepNewCancel" type="button">Annuler</button><button class="btn btn-accent" id="btnPrepNewAdd" type="button">Ajouter</button></div>
       <div class="muted" style="font-size:12px;margin-top:8px;">Le nouvel article est gardé en mémoire pour les prochains événements.</div>
@@ -748,7 +794,24 @@
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
   function shorten(str, n){ return str.length > n ? str.slice(0, n-1) + '…' : str; }
 
+  var CATS = [
+    { id:'formule', label:'Formules',            opt:'Formule (menu)',   prep:true },
+    { id:'entree',  label:'Entrées',             opt:'Entrée',           prep:true },
+    { id:'plat',    label:'Plats',               opt:'Plat',             prep:true },
+    { id:'grill',   label:'Grillades &amp; snack', opt:'Grillade / snack', prep:true },
+    { id:'sucre',   label:'Desserts &amp; sucré',  opt:'Dessert / sucré',  prep:false },
+    { id:'boisson', label:'Boissons',            opt:'Boisson',          prep:false }
+  ];
+  var CAT_RANK = {}, CAT_NAME = {}, CAT_SHORT = {};
+  CATS.forEach(function(c, i){ CAT_RANK[c.id] = i; CAT_NAME[c.id] = c.opt; CAT_SHORT[c.id] = c.opt; });
+  function catDefaultPrep(id){ var c = CATS.find(function(x){ return x.id === id; }); return c ? !!c.prep : true; }
+  function catOptions(selected, withFormule){
+    return CATS.filter(function(c){ return withFormule || c.id !== 'formule'; }).map(function(c){ return '<option value="' + c.id + '"' + (c.id === selected ? ' selected' : '') + '>' + c.opt + '</option>'; }).join('');
+  }
   function catIcon(c){
+    if (c === 'entree') return '<svg viewBox="0 0 32 32" fill="none"><path d="M5 15h22a11 9 0 0 1-22 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M11 13c0-3 2-5 5-6 0 3-1 5-5 6ZM19 13c1-3 3-4 6-4-1 3-3 4-6 4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+    if (c === 'plat') return '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="17" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="17" r="4.5" stroke="currentColor" stroke-width="1.4" opacity=".6"/><path d="M5 5v8M3 5v4a2 2 0 0 0 4 0V5M27 5c-2 1-3 4-3 8h3V5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (c === 'formule') return '<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="8" width="22" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5 14h22M12 8v16" stroke="currentColor" stroke-width="1.5"/></svg>';
     if (c === 'grill') return '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="13" width="24" height="10" rx="5" fill="currentColor" opacity=".18"/><rect x="6.5" y="15" width="19" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 15.5 12 20.5M16 15.5 18 20.5M22 15.5 24 20.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
     if (c === 'boisson') return '<svg viewBox="0 0 32 32" fill="none"><path d="M9 10h14l-2 15a2 2 0 0 1-2 1.8H13a2 2 0 0 1-2-1.8L9 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.3 10h15.4" stroke="currentColor" stroke-width="1.8"/><path d="M13.5 6c0 1.4 1.5 1.4 1.5 2.8S13.5 11 13.5 12.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
     return '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12.5" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M16 19v8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 12.5 16 5.5M16 12.5 22 8.7M16 12.5 10 8.7M16 12.5 22 16.3M16 12.5 10 16.3" stroke="currentColor" stroke-width="1" opacity=".55"/></svg>';
@@ -896,7 +959,7 @@
 
   // ---------- app state ----------
   var store = null;
-  var APP_VERSION = 'Caisse Buvette CCBB · v6.0 · 26/11/2026';
+  var APP_VERSION = 'Caisse Buvette CCBB · v6.1 · 26/11/2026';
   var state = { products: [], events: [], orders: [], services: [], settings: [], cartes: [], view: 'accueil', mode: null, detailEventId: null, seeded: false };
   var cart = []; // [{ productId, name, category, prep, unitPrice, unitCost, qty }]
   var lastFlashId = null;
@@ -904,14 +967,30 @@
   var confirmCloseArmed = false;
   var confirmCloseTimer = null;
 
-  function buvetteId(d){ return 'buvette-' + (d || todayISO()); }
-  function currentEvent(){
-    if (state.mode === 'buvette'){
-      var id = buvetteId();
-      var ex = state.events.find(function(e){ return e.id === id; });
-      if (ex) return ex.status === 'open' ? ex : null;
-      return { id: id, name: 'Buvette', date: todayISO(), status: 'open', type: 'buvette', virtual: true };
+  var goHomeRef = null;
+  // la buvette d'hier reste « la buvette en cours » jusqu'à 2 h du matin
+  function buvetteDate(){
+    var now = new Date();
+    if (now.getHours() < 2){
+      var yd = isoDate(new Date(now.getTime() - 86400000));
+      var ex = state.events.find(function(e){ return e.type === 'buvette' && e.date === yd && e.status === 'open'; });
+      if (ex) return yd;
     }
+    return todayISO();
+  }
+  // une « buvette » = une session ouverte ; si celle du jour est close, la suivante porte un numéro (buvette-2026-11-26-2)
+  function buvetteSession(){
+    var d = buvetteDate();
+    var open = state.events.find(function(e){ return e.type === 'buvette' && e.date === d && e.status === 'open'; });
+    if (open) return open;
+    var n = 1, id;
+    do { id = 'buvette-' + d + (n > 1 ? '-' + n : ''); n++; } while (state.events.some(function(e){ return e.id === id; }));
+    return { id: id, name: 'Buvette', date: d, status: 'open', type: 'buvette', virtual: true };
+  }
+  function buvetteId(d){ return d ? 'buvette-' + d : buvetteSession().id; }
+  function buvetteCloseAt(e){ var d = new Date(e.date + 'T02:00:00'); d.setDate(d.getDate() + 1); return d.getTime(); }
+  function currentEvent(){
+    if (state.mode === 'buvette') return buvetteSession();
     return state.events.find(function(e){ return e.status === 'open' && e.type !== 'buvette'; }) || null;
   }
   // une buvette restée ouverte après sa date est fermée à la première ouverture de l'appli (pas de serveur)
@@ -919,8 +998,9 @@
     if (!store) return;
     var today = todayISO();
     state.events.forEach(function(e){
-      if (e.type === 'buvette' && e.status === 'open' && e.date < today && !e._closing){
+      if (e.type === 'buvette' && e.status === 'open' && Date.now() >= buvetteCloseAt(e) && !e._closing){
         e._closing = true;
+        state.services.filter(function(x){ return x.eventId === e.id && !x.end; }).forEach(function(x){ store.services.update(x.id, { end: Date.now() }, { silent: true }); });
         store.events.update(e.id, { status: 'closed', closedAt: Date.now(), autoClosed: true }, { silent: true });
       } else if (e.type === 'event' && e.status === 'open' && !e._closing && e.date && Date.now() >= eventAutoCloseAt(e)){
         e._closing = true;
@@ -1001,16 +1081,15 @@
   function render(){
     document.getElementById('app').classList.toggle('is-home', state.view === 'accueil');
     if (typeof applyClub === 'function' && state.settingsLoaded !== undefined) applyClub();
-    var solo = !state.mode && (state.view === 'produits' || state.view === 'reglages');
+    var solo = !state.mode && (state.view === 'produits' || state.view === 'reglages' || state.view === 'bilan' || state.view === 'detail');
     document.getElementById('app').classList.toggle('is-solo', solo);
     if (state.view === 'accueil'){ toggleViews(); return; }
-    if (solo){ toggleViews(); if (state.view === 'produits') renderProduits(); return; }
+    if (solo){ toggleViews(); if (state.view === 'produits') renderProduits(); if (state.view === 'bilan') renderHistorique(); if (state.view === 'detail') renderDetail(); return; }
     autoCloseOldBuvettes();
     renderHeader();
     if (state.view === 'vente') renderVente();
     if (state.view === 'cuisine') renderCuisine();
     if (state.view === 'remise') renderRemise();
-    if (state.view === 'historique') renderHistorique();
     if (state.view === 'detail') renderDetail();
     if (state.view === 'produits') renderProduits();
     renderCartBar();
@@ -1124,11 +1203,13 @@
   function renderPrepRows(){
     var box = document.getElementById('prepList');
     box.innerHTML = prepDraft.rows.map(function(r, i){
-      return '<div class="prep-row"><label><input type="checkbox" class="prep-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + '</label>' +
+      return '<div class="prep-row"><div class="rm-main"><label><input type="checkbox" class="prep-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + '</label>' +
+        '<div class="row-meta"><span>' + (CAT_NAME[r.category] || '') + '</span><label><input type="checkbox" class="prep-kit" data-i="' + i + '"' + (r.prep ? ' checked' : '') + '> va en cuisine</label></div></div>' +
         '<input type="number" class="prep-price" data-i="' + i + '" step="0.10" min="0" value="' + r.price + '"><span class="muted">€</span></div>';
     }).join('') || '<div class="empty-hint">Aucun produit : ajoute un nouvel article.</div>';
     box.querySelectorAll('.prep-chk').forEach(function(c){ c.onchange = function(){ prepDraft.rows[+c.getAttribute('data-i')].checked = c.checked; }; });
     box.querySelectorAll('.prep-price').forEach(function(c){ c.onchange = function(){ prepDraft.rows[+c.getAttribute('data-i')].price = parseFloat(c.value) || 0; }; });
+    box.querySelectorAll('.prep-kit').forEach(function(c){ c.onchange = function(){ prepDraft.rows[+c.getAttribute('data-i')].prep = c.checked; }; });
   }
   function fillCopySelect(){
     var sel = document.getElementById('selPrepCopy');
@@ -1159,6 +1240,7 @@
     document.getElementById('inpEventPlace').value = ev ? (ev.place || '') : ((getClub() && getClub().salle) || '');
     document.getElementById('inpEventDate').value = ev ? ev.date : todayISO();
     document.getElementById('inpEventEnd').value = ev && ev.endDate && ev.endDate !== ev.date ? ev.endDate : '';
+    document.getElementById('inpEventFloat').value = ev && typeof ev.floatAmount === 'number' ? ev.floatAmount : '';
     document.getElementById('prepNewForm').hidden = true;
     if (ev && ev.items){
       var inEv = {};
@@ -1185,6 +1267,13 @@
     var endDate = document.getElementById('inpEventEnd').value;
     if (endDate && endDate < date) endDate = date;
     var data = { name: name, date: date, endDate: endDate || date, type: 'event', items: items, place: document.getElementById('inpEventPlace').value.trim(), status: startNow ? 'open' : 'prepared' };
+    var fv = parseFloat(document.getElementById('inpEventFloat').value);
+    var prevEv = prepDraft.id ? state.events.find(function(e){ return e.id === prepDraft.id; }) : null;
+    if (!isNaN(fv) && fv >= 0 && (!prevEv || prevEv.floatAmount !== round2(fv))){
+      var nowF = Date.now(), byF = ''; try { byF = localStorage.getItem('ccbb_prenom') || ''; } catch(e){}
+      data.floatAmount = round2(fv); data.floatAt = nowF;
+      data.cashLog = ((prevEv && prevEv.cashLog) || []).concat([{ t: nowF, kind: 'fond', amount: round2(fv), by: byF }]);
+    }
     if (prepDraft.id){
       var cur = state.events.find(function(e){ return e.id === prepDraft.id; });
       if (cur && cur.status === 'open') data.status = 'open';
@@ -1202,19 +1291,24 @@
     var ev = currentEvent();
     document.getElementById('ventEmpty').hidden = !!ev;
     document.getElementById('ventActive').hidden = !ev;
-    if (!ev){ cart = []; renderPrepared(); return; }
+    var closedBuv = !ev && isBuvette();
+    document.getElementById('ventEmptyTitle').textContent = closedBuv ? 'Buvette close' : 'Aucun événement en cours';
+    document.getElementById('ventEmptyText').textContent = closedBuv ? 'La buvette du jour est terminée. Les ventes sont gardées dans les bilans.' : 'Crée un événement (soirée, match, tournoi) pour ouvrir la caisse et commencer à enregistrer les commandes.';
+    document.getElementById('btnNewEventEmpty').hidden = closedBuv;
+    document.getElementById('btnBuvReopen').hidden = !closedBuv;
+    if (!ev){ cart = []; if (closedBuv) document.getElementById('preparedList').innerHTML = ''; else renderPrepared(); return; }
 
     var sections = document.getElementById('tileSections');
-    var groups = { grill: [], boisson: [], sucre: [] };
+    var groups = {}; CATS.forEach(function(c){ groups[c.id] = []; });
     var sale = saleProducts(ev);
     sale.forEach(function(p){ (groups[p.category] || groups.grill).push(p); });
 
     var cartQty = {};
     cart.forEach(function(l){ cartQty[l.productId] = l.qty; });
 
-    var labels = { grill: 'Grillades &amp; snack', boisson: 'Boissons', sucre: 'Sucré' };
+    var labels = {}; CATS.forEach(function(c){ labels[c.id] = c.label; });
     var html = '';
-    ['grill','boisson','sucre'].forEach(function(cat){
+    CATS.map(function(c){ return c.id; }).forEach(function(cat){
       if (!groups[cat].length) return;
       html += '<div class="section-label">' + labels[cat] + '</div><div class="tile-grid">';
       groups[cat].forEach(function(p){
@@ -1307,10 +1401,21 @@
   }
 
   function addToCart(product){
+    if (isBuvette() && !mySvc()){
+      showToast('Touche « Je prends la buvette » pour pouvoir vendre');
+      var pv = ''; try { pv = localStorage.getItem('ccbb_prenom') || ''; } catch(e){}
+      document.getElementById('inpSvcName').value = pv;
+      document.getElementById('overlaySvc').hidden = false;
+      return;
+    }
     lastFlashId = product.id;
     var existing = cart.find(function(l){ return l.productId === product.id; });
     if (existing) existing.qty += 1;
-    else cart.push({ productId: product.id, name: product.name, category: product.category, prep: !!product.prep, recap: product.recap || '', unitPrice: product.price, unitCost: product.cost || 0, qty: 1 });
+    else {
+      var full = state.products.find(function(x){ return x.id === product.id; });
+      var parts = full && full.formula && full.formula.length ? full.formula.map(function(c){ return { name: c.name, prep: !!c.prep }; }) : null;
+      cart.push({ productId: product.id, name: product.name, category: product.category, prep: !!product.prep, recap: product.recap || '', parts: parts, unitPrice: product.price, unitCost: product.cost || 0, qty: 1 });
+    }
     render();
     setTimeout(function(){ lastFlashId = null; if (state.view === 'vente') render(); }, 260);
   }
@@ -1407,7 +1512,7 @@
     var offered = payment === 'offert';
     var fullTotal = cartTotal();
     var lines = cart.map(function(l){
-      return { productId: l.productId, name: l.name, category: l.category, prep: l.prep, recap: l.recap || '', unitPrice: l.unitPrice, unitCost: l.unitCost, qty: l.qty, lineTotal: offered ? 0 : round2(l.unitPrice * l.qty), lineCost: l.unitCost * l.qty };
+      return { productId: l.productId, name: l.name, category: l.category, prep: l.prep, recap: l.recap || '', parts: l.parts || null, unitPrice: l.unitPrice, unitCost: l.unitCost, qty: l.qty, lineTotal: offered ? 0 : round2(l.unitPrice * l.qty), lineCost: l.unitCost * l.qty };
     });
     var cost = lines.reduce(function(s,l){ return s + l.lineCost; }, 0);
     var hasKitchen = ev.type === 'buvette' ? false : lines.some(function(l){ return l.prep; });
@@ -1461,6 +1566,10 @@
 
   function kitchenItemsHtml(o){
     return '<div class="kitchen-items">' + o.lines.filter(function(l){ return l.prep; }).map(function(l){
+      if (l.parts && l.parts.length){
+        var pp = l.parts.filter(function(c){ return c.prep; });
+        return '<div class="kitchen-item"><span class="ki-qty">' + l.qty + '×</span><span class="ki-name">' + escapeHtml(l.name) + '<span class="sub-comp">' + pp.map(function(c){ return l.qty + ' ' + escapeHtml(c.name); }).join(' · ') + '</span></span></div>';
+      }
       return '<div class="kitchen-item"><span class="ki-qty">' + l.qty + '×</span><span class="ki-name">' + escapeHtml(l.name) + '</span></div>';
     }).join('') + '</div>';
   }
@@ -1642,6 +1751,18 @@
   }
   function fmtDT(ts){ var d = new Date(ts); return ('0'+d.getDate()).slice(-2) + '/' + ('0'+(d.getMonth()+1)).slice(-2) + ' à ' + hhmm(ts); }
   function hhmm(ts){ var d = new Date(ts); return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
+  var buvCloseArmed = false, buvCloseTimer = null;
+  async function closeBuvette(){
+    var ev = currentEvent(); if (!ev) return;
+    if (!ev.virtual){
+      state.services.filter(function(x){ return x.eventId === ev.id && !x.end; }).forEach(function(x){ store.services.update(x.id, { end: Date.now() }); });
+      await store.events.update(ev.id, { status: 'closed', closedAt: Date.now() });
+    }
+    try { localStorage.removeItem(mySvcKey()); } catch(e){}
+    buvCloseArmed = false;
+    showToast('Buvette close. Merci !');
+    if (goHomeRef) goHomeRef();
+  }
   function renderServiceBar(){
     var bar = document.getElementById('svcBar');
     if (!isBuvette() || state.view !== 'vente'){ bar.hidden = true; return; }
@@ -1665,15 +1786,32 @@
         document.getElementById('overlaySvc').hidden = false;
       };
     }
+    bar.insertAdjacentHTML('beforeend', '<div style="width:100%;"><button class="btn btn-sm ' + (buvCloseArmed ? 'btn-danger' : 'btn-ghost') + '" id="btnBuvClose" type="button">' + (buvCloseArmed ? 'Confirmer : clore la buvette' : 'Clore la buvette (fin de journée)') + '</button></div>');
+    document.getElementById('btnBuvClose').onclick = function(){
+      if (buvCloseArmed){ closeBuvette(); return; }
+      buvCloseArmed = true; renderServiceBar();
+      clearTimeout(buvCloseTimer); buvCloseTimer = setTimeout(function(){ buvCloseArmed = false; renderServiceBar(); }, 4000);
+    };
   }
 
+  function bilanOrders(){
+    var kind = state.bilanKind === 'buvette' ? 'buvette' : 'event';
+    var ids = {}; histEvents().forEach(function(e){ if ((e.type === 'buvette') === (kind === 'buvette')) ids[e.id] = true; });
+    return state.orders.filter(function(o){ return ids[o.eventId]; });
+  }
   function renderHistorique(){
     var stats = document.getElementById('seasonStats');
-    var allOrders = state.orders;
+    var kind = state.bilanKind === 'buvette' ? 'buvette' : 'event';
+    var kEvents = histEvents().filter(function(e){ return (e.type === 'buvette') === (kind === 'buvette'); });
+    var allOrders = bilanOrders();
+    document.getElementById('segEvent').className = kind === 'event' ? 'on' : '';
+    document.getElementById('segBuv').className = kind === 'buvette' ? 'on' : '';
+    document.getElementById('bilanLabel').textContent = kind === 'buvette' ? 'Buvette : saison en cours' : 'Événements : saison en cours';
+    document.getElementById('chartTitle').textContent = kind === 'buvette' ? 'Chiffre d\'affaires par jour de buvette' : 'Chiffre d\'affaires par événement';
     var totalRevenue = allOrders.reduce(function(s,o){ return s + o.total; }, 0);
     var totalCost = allOrders.reduce(function(s,o){ return s + (o.cost||0); }, 0);
     var totalMargin = totalRevenue - totalCost;
-    var nbEvents = histEvents().length;
+    var nbEvents = kEvents.length;
     var byProductQty = {};
     allOrders.forEach(function(o){ o.lines.forEach(function(l){ byProductQty[l.name] = (byProductQty[l.name]||0) + l.qty; }); });
     var topProduct = Object.keys(byProductQty).sort(function(a,b){ return byProductQty[b]-byProductQty[a]; })[0];
@@ -1687,9 +1825,10 @@
       '<div class="stat-tile"><div class="st-value" style="font-size:15px;">' + (topProduct ? escapeHtml(topProduct) : '—') + '</div><div class="st-label">Produit le plus vendu</div></div>' +
       statTile(fmtEUR.format(offeredOf(allOrders)), 'Offert bénévoles (valeur)') +
       statTile(avgBasket(allOrders), 'Panier moyen');
+    if (kind === 'buvette') stats.innerHTML = stats.innerHTML.replace('Événement' + (nbEvents>1?'s':'') + '</div>', 'Jour' + (nbEvents>1?'s':'') + ' de buvette</div>');
 
     var chartCard = document.getElementById('chartCard');
-    var sortedEvents = histEvents().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); }).slice(0, 8);
+    var sortedEvents = kEvents.slice().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); }).slice(0, 8);
     if (!sortedEvents.length){ chartCard.hidden = true; }
     else {
       chartCard.hidden = false;
@@ -1698,7 +1837,7 @@
       document.getElementById('chartBars').innerHTML = totals.reverse().map(function(t){
         var pct = Math.round((t.total / max) * 100);
         return '<div class="bar-row">' +
-          '<span class="bar-label">' + escapeHtml(shorten(t.e.name, 16)) + '</span>' +
+          '<span class="bar-label">' + escapeHtml(kind === 'buvette' ? (t.e.date || '').slice(8) + '/' + (t.e.date || '').slice(5,7) : shorten(t.e.name, 16)) + '</span>' +
           '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
           '<span class="bar-value tabular">' + fmtEUR.format(t.total) + '</span>' +
         '</div>';
@@ -1707,7 +1846,7 @@
 
     var listEl = document.getElementById('eventsList');
     var emptyEl = document.getElementById('eventsEmpty');
-    var events = histEvents().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
+    var events = kEvents.slice().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
     emptyEl.hidden = events.length > 0;
     listEl.innerHTML = events.map(function(e){
       var rev = eventRevenue(e.id);
@@ -1725,6 +1864,7 @@
     listEl.querySelectorAll('.event-card').forEach(function(card){
       card.addEventListener('click', function(){
         state.detailEventId = card.getAttribute('data-event');
+        state.detailFromTab = false;
         state.view = 'detail';
         toggleViews();
         render();
@@ -1801,8 +1941,10 @@
   }
 
   function renderDetail(){
-    var ev = state.events.find(function(e){ return e.id === state.detailEventId; });
-    if (!ev){ state.view = 'historique'; toggleViews(); render(); return; }
+    var ev = state.detailFromTab ? currentEvent() : state.events.find(function(e){ return e.id === state.detailEventId; });
+    if (!ev){ state.detailFromTab = false; state.view = state.mode ? 'vente' : 'bilan'; toggleViews(); render(); return; }
+    var priv = !state.detailFromTab || isUnlocked();
+    document.getElementById('btnBackDetail').hidden = !!state.detailFromTab;
     var orders = ordersFor(ev.id);
     var rev = eventRevenue(ev.id);
     var cost = eventCost(ev.id);
@@ -1813,8 +1955,8 @@
 
     document.getElementById('detailStats').innerHTML =
       '<div class="stat-tile"><div class="st-value tabular">' + fmtEUR.format(rev) + '</div><div class="st-label">Recette</div></div>' +
-      '<div class="stat-tile"><div class="st-value tabular">' + fmtEUR.format(cost) + '</div><div class="st-label">Coût</div></div>' +
-      '<div class="stat-tile"><div class="st-value tabular margin-pos">' + fmtEUR.format(margin) + '</div><div class="st-label">Marge</div></div>' +
+      (priv ? '<div class="stat-tile"><div class="st-value tabular">' + fmtEUR.format(cost) + '</div><div class="st-label">Coût</div></div>' +
+      '<div class="stat-tile"><div class="st-value tabular margin-pos">' + fmtEUR.format(margin) + '</div><div class="st-label">Marge</div></div>' : '') +
       '<div class="stat-tile"><div class="st-value tabular">' + orders.length + '</div><div class="st-label">Commandes</div></div>' +
       statTile(fmtEUR.format(offeredOf(orders)), 'Offert bénévoles (valeur)') +
       statTile(avgBasket(orders), 'Panier moyen');
@@ -1843,11 +1985,11 @@
     if (!rows.length){
       table.innerHTML = '<tr><td class="muted" style="padding:16px 0;">Aucune commande enregistrée.</td></tr>';
     } else {
-      table.innerHTML = '<thead><tr><th>Produit</th><th class="num">Qté</th><th class="num">CA</th><th class="num">Coût</th><th class="num">Marge</th></tr></thead><tbody>' +
+      table.innerHTML = '<thead><tr><th>Produit</th><th class="num">Qté</th><th class="num">CA</th>' + (priv ? '<th class="num">Coût</th><th class="num">Marge</th>' : '') + '</tr></thead><tbody>' +
         rows.map(function(name){
           var r = byProduct[name];
           var m = r.total - r.cost;
-          return '<tr><td>' + escapeHtml(name) + '</td><td class="num tabular">' + r.qty + '</td><td class="num tabular">' + fmtEUR.format(r.total) + '</td><td class="num tabular">' + fmtEUR.format(r.cost) + '</td><td class="num tabular margin-pos">' + fmtEUR.format(m) + '</td></tr>';
+          return '<tr><td>' + escapeHtml(name) + '</td><td class="num tabular">' + r.qty + '</td><td class="num tabular">' + fmtEUR.format(r.total) + '</td>' + (priv ? '<td class="num tabular">' + fmtEUR.format(r.cost) + '</td><td class="num tabular margin-pos">' + fmtEUR.format(m) + '</td>' : '') + '</tr>';
         }).join('') + '</tbody>';
     }
     document.getElementById('csvEventBox').hidden = true;
@@ -1857,7 +1999,7 @@
   function renderProduits(){
     renderCards(); renderExamples();
     var list = document.getElementById('productsList');
-    var catRank = { grill: 0, boisson: 1, sucre: 2 };
+    var catRank = CAT_RANK;
     var q = normTxt((document.getElementById('catSearch') || {}).value || '');
     var products = state.products.slice().sort(function(a,b){ return ((catRank[a.category] || 0) - (catRank[b.category] || 0)) || String(a.name).localeCompare(String(b.name)); })
       .filter(function(p){ return !q || normTxt(p.name).indexOf(q) >= 0; });
@@ -1871,11 +2013,8 @@
           '<div class="pr-field"><label>Marge</label><div class="pr-margin-display tabular">' + fmtEUR.format(margin) + '</div></div>' +
         '</div>' +
         '<div class="pr-bottom">' +
-          '<select class="pr-cat">' +
-            '<option value="grill"' + (p.category==='grill'?' selected':'') + '>Grillades / snack</option>' +
-            '<option value="boisson"' + (p.category==='boisson'?' selected':'') + '>Boissons</option>' +
-            '<option value="sucre"' + (p.category==='sucre'?' selected':'') + '>Sucré</option>' +
-          '</select>' +
+          '<select class="pr-cat">' + catOptions(p.category, p.category === 'formule') + '</select>' +
+          (p.formula && p.formula.length ? '<div class="muted" style="font-size:12px;width:100%;">Formule : ' + p.formula.map(function(c){ return escapeHtml(c.name); }).join(' + ') + '</div>' : '') +
           '<div class="pr-field" style="width:100%"><label>Cuisine : compte comme</label><input type="text" class="pr-recap" placeholder="ex. Saucisses + Frites" value="' + escapeHtml(p.recap || '') + '"></div>' +
           '<div class="toggle-row">' +
             '<label><input type="checkbox" class="pr-active"' + (p.active !== false ? ' checked' : '') + '> Visible en caisse</label>' +
@@ -1927,7 +2066,7 @@
 
   function renderTabs(){
     ['vente','cuisine','remise','historique','produits'].forEach(function(t){
-      var isDetailTab = (t === 'historique' && state.view === 'detail');
+      var isDetailTab = (t === 'historique' && state.view === 'detail' && state.detailFromTab);
       var b = document.getElementById('tab' + capitalize(t));
       b.classList.toggle('active', state.view === t || isDetailTab);
       b.hidden = isBuvette() && (t === 'cuisine' || t === 'remise' || t === 'produits');
@@ -1940,7 +2079,7 @@
     document.getElementById('view-vente').hidden = state.view !== 'vente';
     document.getElementById('view-cuisine').hidden = state.view !== 'cuisine';
     document.getElementById('view-remise').hidden = state.view !== 'remise';
-    document.getElementById('view-historique').hidden = state.view !== 'historique';
+    document.getElementById('view-historique').hidden = state.view !== 'bilan';
     document.getElementById('view-detail').hidden = state.view !== 'detail';
     document.getElementById('view-produits').hidden = state.view !== 'produits';
     document.getElementById('view-reglages').hidden = state.view !== 'reglages';
@@ -2006,7 +2145,9 @@
     var name = ''; try { name = localStorage.getItem('ccbb_prenom') || ''; } catch(e){}
     var list = getAdherents();
     var hw = document.getElementById('homeWho');
-    if (hw){ hw.hidden = !(name || list.length); hw.innerHTML = name ? 'Connecté : <b>' + escapeHtml(name) + '</b> · <a href="#" id="lnkWho" style="color:var(--accent-text,var(--accent));font-weight:600;">changer</a>' : (list.length ? '<a href="#" id="lnkWho" style="color:var(--accent-text,var(--accent));font-weight:600;">Qui es-tu ?</a>' : ''); var l = document.getElementById('lnkWho'); if (l) l.onclick = function(e){ e.preventDefault(); openWho(); }; }
+    if (hw){ hw.hidden = !(name || list.length); hw.className = ''; hw.style.cssText = 'margin:0;';
+      hw.innerHTML = name ? '<button type="button" class="home-who-btn" id="lnkWho"><span>👤 <b>' + escapeHtml(name) + '</b></span><span style="color:var(--accent-text,var(--accent));font-weight:600;">changer</span></button>' : (list.length ? '<button type="button" class="home-who-btn todo" id="lnkWho">👤 Qui es-tu ? Touche ici</button>' : '');
+      var l = document.getElementById('lnkWho'); if (l) l.onclick = function(e){ e.preventDefault(); openWho(); }; }
     var wi = document.getElementById('whoInfo'); if (wi) wi.textContent = name ? 'Tu es : ' + name + (who && who.l ? ' (licence ' + who.l + ')' : '') : 'Personne choisie sur ce téléphone.';
     var ai = document.getElementById('adhInfo'); if (ai) ai.textContent = list.length ? 'Liste chargée : ' + list.length + ' personnes.' : 'Aucune liste d\'adhérents chargée.';
     var cl = document.getElementById('btnAdhClear'); if (cl) cl.hidden = !list.length;
@@ -2016,8 +2157,8 @@
     var q = normTxt(document.getElementById('inpWho').value), list = getAdherents(), box = document.getElementById('whoList');
     if (!q){ box.innerHTML = '<div class="muted" style="padding:8px;font-size:13px;">' + list.length + ' personnes dans la liste.</div>'; return; }
     var toks = q.split(/\s+/);
-    var res = list.filter(function(r){ var h = normTxt(r.p + ' ' + r.n + ' ' + r.n + ' ' + r.p + ' ' + r.l); return toks.every(function(t){ return h.indexOf(t) >= 0; }); }).slice(0, 8);
-    box.innerHTML = res.map(function(r, i){ return '<button type="button" class="btn btn-ghost btn-block who-pick" data-i="' + i + '" style="text-align:left;margin-bottom:6px;"><b>' + escapeHtml(whoLabel(r)) + '</b>' + (r.l ? ' <span class="muted" style="font-size:12px;">· licence ' + escapeHtml(r.l) + '</span>' : '') + '</button>'; }).join('') || '<div class="muted" style="padding:8px;font-size:13px;">Personne ne correspond.</div>';
+    var res = list.filter(function(r){ var h = normTxt(r.p + ' ' + r.n + ' ' + r.n + ' ' + r.p + ' ' + r.l); return toks.every(function(t){ return h.indexOf(t) >= 0; }); }).slice(0, 10);
+    box.innerHTML = res.map(function(r, i){ return '<button type="button" class="btn btn-ghost btn-block who-pick" data-i="' + i + '" style="text-align:left;margin-bottom:8px;font-size:18px;padding:16px 14px;"><b>' + escapeHtml(whoLabel(r)) + '</b>' + (r.l ? ' <span class="muted" style="font-size:12px;">· licence ' + escapeHtml(r.l) + '</span>' : '') + '</button>'; }).join('') || '<div class="muted" style="padding:8px;font-size:13px;">Personne ne correspond.</div>';
     box.querySelectorAll('.who-pick').forEach(function(b){ b.onclick = function(){ setWho(res[+b.getAttribute('data-i')]); document.getElementById('overlayWho').hidden = true; showToast('Bonjour ' + ((res[+b.getAttribute('data-i')].p) || '') + ' !'); }; });
   }
   function openWho(){ document.getElementById('inpWho').value = ''; renderWhoList(); document.getElementById('overlayWho').hidden = false; setTimeout(function(){ try { document.getElementById('inpWho').focus(); } catch(e){} }, 150); }
@@ -2044,7 +2185,7 @@
     var club = getClub(); var c = club ? JSON.parse(JSON.stringify(club)) : null; if (c){ delete c.id; delete c.updatedAt; }
     var data = {
       format: 'caisse-demarrage-1', exporte: new Date().toISOString().slice(0, 10), club: c,
-      produits: state.products.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).map(function(p){ return { nom: p.name, prix: p.price, achat: p.cost || 0, categorie: p.category, prep: !!p.prep, buvette: !!p.buvette, recap: p.recap || '', actif: p.active !== false, exemple: !!p.example }; }),
+      produits: state.products.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).map(function(p){ return { nom: p.name, prix: p.price, achat: p.cost || 0, categorie: p.category, prep: !!p.prep, buvette: !!p.buvette, recap: p.recap || '', formule: (p.formula && p.formula.length) ? p.formula.map(function(c){ return c.name; }) : null, actif: p.active !== false, exemple: !!p.example }; }),
       cartes: state.cartes.map(function(k){ return { nom: k.name, exemple: !!k.example, produits: (k.items || []).map(function(it){ return { nom: it.name, prix: it.price }; }) }; }),
       adherents: getAdherents().map(function(r){ return { nom: r.n, prenom: r.p, licence: r.l }; })
     };
@@ -2065,13 +2206,20 @@
     for (var i = 0; i < prods.length; i++){
       var p = prods[i]; var nm = cleanStr(p.nom, 80); var pr = parseFloat(p.prix);
       if (!nm || !(pr >= 0)) continue;
-      var cat = ['grill','boisson','sucre'].indexOf(p.categorie) >= 0 ? p.categorie : 'grill';
+      var cat = CATS.some(function(c){ return c.id === p.categorie; }) ? p.categorie : 'grill';
       var data = { name: nm, price: pr, cost: parseFloat(p.achat) || 0, category: cat, prep: !!p.prep, buvette: !!p.buvette, recap: cleanStr(p.recap, 80), active: p.actif !== false };
       if (p.exemple) data.example = true;
       var ex = idByName[normTxt(nm)];
       if (ex){ await store.products.update(ex, data); }
       else { data.order = ++maxOrder; idByName[normTxt(nm)] = await store.products.add(data); }
       nProd++;
+    }
+    var metaByName = {}; prods.forEach(function(q){ if (q && q.nom) metaByName[normTxt(q.nom)] = q; });
+    for (var fi = 0; fi < prods.length; fi++){
+      var fp = prods[fi]; if (!fp || !Array.isArray(fp.formule) || !fp.formule.length) continue;
+      var fid = idByName[normTxt(fp.nom)]; if (!fid) continue;
+      var fcomps = fp.formule.map(function(n){ var m = metaByName[normTxt(n)] || {}; var cid = idByName[normTxt(n)]; return cid ? { productId: cid, name: cleanStr(n, 80), prep: !!m.prep, recap: cleanStr(m.recap || '', 80) } : null; }).filter(Boolean);
+      if (fcomps.length) await store.products.update(fid, { formula: fcomps });
     }
     if (nProd) msgs.push(nProd + ' produits');
     var nCard = 0, cards = Array.isArray(d.cartes) ? d.cartes.slice(0, 100) : [];
@@ -2220,19 +2368,20 @@
   }
   function renderCardRows(){
     var box = document.getElementById('cardRows');
-    var catName = { grill: 'Grillades / snack', boisson: 'Boissons', sucre: 'Sucré' };
     box.innerHTML = cardDraft.rows.map(function(r, i){
-      return '<div class="prep-row" data-n="' + escapeHtml(normTxt(r.name)) + '"><label><input type="checkbox" class="cd-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + ' <span class="muted" style="font-size:11px;">' + (catName[r.category] || '') + '</span></label>' +
+      return '<div class="prep-row" data-n="' + escapeHtml(normTxt(r.name)) + '"><div class="rm-main"><label><input type="checkbox" class="cd-chk" data-i="' + i + '"' + (r.checked ? ' checked' : '') + '> ' + escapeHtml(r.name) + '</label>' +
+        '<div class="row-meta"><span>' + (CAT_NAME[r.category] || '') + '</span>' + (cardDraft.mode === 'buvette' ? '' : '<label><input type="checkbox" class="cd-kit" data-i="' + i + '"' + (r.prep ? ' checked' : '') + '> va en cuisine</label>') + '</div></div>' +
         '<input type="number" class="cd-price" data-i="' + i + '" step="0.10" min="0" value="' + r.price + '"><span class="muted">€</span></div>';
     }).join('') || '<div class="empty-hint">Le catalogue est vide : ajoute un produit ci-dessus.</div>';
     box.querySelectorAll('.cd-chk').forEach(function(c){ c.onchange = function(){ cardDraft.rows[+c.getAttribute('data-i')].checked = c.checked; }; });
     box.querySelectorAll('.cd-price').forEach(function(c){ c.onchange = function(){ cardDraft.rows[+c.getAttribute('data-i')].price = parseFloat(c.value) || 0; }; });
+    box.querySelectorAll('.cd-kit').forEach(function(c){ c.onchange = function(){ cardDraft.rows[+c.getAttribute('data-i')].prep = c.checked; }; });
   }
   function openCardEditor(id, mode){
     var card = id ? state.cartes.find(function(c){ return c.id === id; }) : null;
     var isBuv = mode === 'buvette';
     cardDraft = { id: id || null, mode: isBuv ? 'buvette' : 'card', rows: [] };
-    var catRank = { grill: 0, boisson: 1, sucre: 2 };
+    var catRank = CAT_RANK;
     var byName = function(a,b){ return ((catRank[a.category] || 0) - (catRank[b.category] || 0)) || String(a.name).localeCompare(String(b.name)); };
     if (isBuv){
       var all = state.products.slice().sort(byName);
@@ -2247,7 +2396,7 @@
     document.getElementById('cardHelp').textContent = isBuv ? 'Coche les produits vendus à la buvette et règle leurs prix. Les produits décochés restent dans le catalogue.' : 'Coche les produits de cette carte et règle leurs prix.';
     document.getElementById('inpCardName').value = card ? card.name : '';
     document.getElementById('edSearch').value = '';
-    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = '';
+    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = ''; document.getElementById('edNewCost').value = '';
     renderCardRows();
     document.getElementById('overlayCard').hidden = false;
   }
@@ -2259,11 +2408,60 @@
     var same = state.products.find(function(p){ return normTxt(p.name) === normTxt(name); });
     if (same){ showToast('« ' + same.name + ' » existe déjà dans le catalogue : coche-le dans la liste'); document.getElementById('edSearch').value = name; document.getElementById('edSearch').dispatchEvent(new Event('input')); return; }
     var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
-    var prep = cat === 'grill';
-    var newId = await store.products.add({ name: name, price: price, cost: 0, category: cat, order: maxOrder + 1, active: true, prep: prep, buvette: cardDraft.mode === 'buvette', recap: '' });
-    cardDraft.rows.unshift({ productId: newId, name: name, category: cat, prep: prep, recap: '', cost: 0, checked: true, price: price, isNew: true });
-    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = '';
+    var prep = document.getElementById('edNewPrep').checked;
+    var cost = parseFloat(document.getElementById('edNewCost').value) || 0;
+    var newId = await store.products.add({ name: name, price: price, cost: cost, category: cat, order: maxOrder + 1, active: true, prep: prep, buvette: cardDraft.mode === 'buvette', recap: '' });
+    cardDraft.rows.unshift({ productId: newId, name: name, category: cat, prep: prep, recap: '', cost: cost, checked: true, price: price, isNew: true });
+    document.getElementById('edNewName').value = ''; document.getElementById('edNewPrice').value = ''; document.getElementById('edNewCost').value = '';
     renderCardRows(); showToast('« ' + name + ' » ajouté au catalogue et à cette carte');
+  }
+  // ---------- formules (menu = plusieurs produits à un prix global) ----------
+  var formulaCtx = null;
+  function fmComponents(){ return state.products.filter(function(p){ return p.category !== 'formule' && p.active !== false; }).sort(function(a,b){ return ((CAT_RANK[a.category] || 0) - (CAT_RANK[b.category] || 0)) || String(a.name).localeCompare(String(b.name)); }); }
+  function renderFmList(){
+    var q = normTxt(document.getElementById('fmSearch').value);
+    var box = document.getElementById('fmList');
+    var checked = {}; box.querySelectorAll('.fm-chk:checked').forEach(function(c){ checked[c.getAttribute('data-id')] = true; });
+    if (!box.getAttribute('data-init')){ box.setAttribute('data-init', '1'); }
+    var list = fmComponents();
+    box.innerHTML = list.map(function(p){
+      return '<div class="prep-row" data-n="' + escapeHtml(normTxt(p.name)) + '"' + (q && normTxt(p.name).indexOf(q) < 0 ? ' hidden' : '') + '><div class="rm-main"><label><input type="checkbox" class="fm-chk" data-id="' + p.id + '"' + (fmSel[p.id] ? ' checked' : '') + '> ' + escapeHtml(p.name) + '</label><div class="row-meta"><span>' + (CAT_NAME[p.category] || '') + ' · ' + fmtEUR.format(p.price) + '</span></div></div></div>';
+    }).join('') || '<div class="empty-hint">Aucun produit dans le catalogue.</div>';
+    box.querySelectorAll('.fm-chk').forEach(function(c){ c.onchange = function(){ fmSel[c.getAttribute('data-id')] = c.checked; updateFmSum(); }; });
+    updateFmSum();
+  }
+  var fmSel = {};
+  function updateFmSum(){
+    var ids = Object.keys(fmSel).filter(function(k){ return fmSel[k]; });
+    var tot = 0; ids.forEach(function(id){ var p = state.products.find(function(x){ return x.id === id; }); if (p) tot += p.price; });
+    document.getElementById('fmSum').textContent = ids.length ? ids.length + ' produit' + (ids.length > 1 ? 's' : '') + ' choisi' + (ids.length > 1 ? 's' : '') + ' · à l\'unité : ' + fmtEUR.format(tot) : 'Coche les produits de la formule.';
+  }
+  function openFormula(ctx){
+    formulaCtx = ctx; fmSel = {};
+    document.getElementById('fmName').value = ''; document.getElementById('fmPrice').value = ''; document.getElementById('fmSearch').value = '';
+    renderFmList();
+    document.getElementById('overlayFormule').hidden = false;
+  }
+  async function saveFormula(){
+    var name = document.getElementById('fmName').value.trim();
+    var price = parseFloat(document.getElementById('fmPrice').value);
+    if (!name){ document.getElementById('fmName').focus(); return; }
+    if (!(price >= 0)){ document.getElementById('fmPrice').focus(); return; }
+    var parts = Object.keys(fmSel).filter(function(k){ return fmSel[k]; }).map(function(id){ return state.products.find(function(x){ return x.id === id; }); }).filter(Boolean);
+    if (parts.length < 2){ showToast('Choisis au moins 2 produits'); return; }
+    if (state.products.some(function(p){ return normTxt(p.name) === normTxt(name); })){ showToast('Un produit porte déjà ce nom'); return; }
+    var prepParts = parts.filter(function(p){ return p.prep; });
+    var cost = round2(parts.reduce(function(s,p){ return s + (p.cost || 0); }, 0));
+    var recap = prepParts.map(function(p){ return p.recap || p.name; }).join(' + ');
+    var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
+    var prod = { name: name, price: round2(price), cost: cost, category: 'formule', order: maxOrder + 1, active: true, prep: prepParts.length > 0, buvette: formulaCtx === 'buvette', recap: recap,
+      formula: parts.map(function(p){ return { productId: p.id, name: p.name, prep: !!p.prep, recap: p.recap || '' }; }) };
+    var id = await store.products.add(prod);
+    var row = { productId: id, name: name, category: 'formule', prep: prod.prep, recap: recap, cost: cost, checked: true, price: prod.price };
+    if (formulaCtx === 'event'){ prepDraft.rows.unshift(row); renderPrepRows(); }
+    else { cardDraft.rows.unshift(row); renderCardRows(); }
+    document.getElementById('overlayFormule').hidden = true;
+    showToast('Formule « ' + name + ' » créée');
   }
   function itemsFromRows(rows){
     return rows.filter(function(r){ return r.checked; }).map(function(r){ return { productId: r.productId, name: r.name, price: r.price, cost: r.cost, category: r.category, prep: r.prep, recap: r.recap }; });
@@ -2299,7 +2497,9 @@
     if (!n) return null;
     if (n.indexOf('boiss') === 0 || n === 'soft' || n === 'bar') return 'boisson';
     if (n.indexOf('sucr') === 0 || n.indexOf('dessert') === 0 || n.indexOf('confis') === 0) return 'sucre';
-    if (n.indexOf('snack') === 0 || n.indexOf('grill') === 0 || n.indexOf('plat') === 0 || n.indexOf('cuisine') === 0) return 'grill';
+    if (n.indexOf('entr') === 0) return 'entree';
+    if (n.indexOf('plat') === 0 || n.indexOf('repas') === 0) return 'plat';
+    if (n.indexOf('snack') === 0 || n.indexOf('grill') === 0 || n.indexOf('cuisine') === 0) return 'grill';
     return null;
   }
   function parseYesNo(t){ var n = normTxt(t); if (n === 'oui' || n === 'o' || n === 'x' || n === '1' || n === 'yes') return true; if (n === 'non' || n === 'n' || n === '0' || n === 'no') return false; return null; }
@@ -2334,7 +2534,7 @@
     var r = parseImport(document.getElementById('impText').value, importMode === 'buvette' ? true : (importMode === 'card' ? false : document.getElementById('impBuv').checked));
     importParsed = r;
     var box = document.getElementById('impPreview');
-    var catLabel = { boisson: 'boisson', sucre: 'sucré', grill: 'snack' };
+    var catLabel = { boisson: 'boisson', sucre: 'sucré', grill: 'snack', entree: 'entrée', plat: 'plat' };
     var html = r.items.map(function(it){
       var ex = state.products.find(function(p){ return normTxt(p.name) === normTxt(it.name); });
       it.existingId = ex ? ex.id : null;
@@ -2511,7 +2711,15 @@
     var selPoste = document.getElementById('selPoste');
     selPoste.value = manualPoste();
     selPoste.addEventListener('change', function(){ setPoste(selPoste.value); });
-    document.getElementById('tabHistorique').addEventListener('click', function(){ state.view='historique'; toggleViews(); render(); });
+    document.getElementById('tabHistorique').addEventListener('click', function(){
+      var ce = currentEvent();
+      if (!ce){ showToast('Aucun événement en cours'); return; }
+      state.detailEventId = ce.id; state.detailFromTab = true; state.view = 'detail'; toggleViews(); render();
+    });
+    document.getElementById('btnModeBilan').addEventListener('click', function(){ requireCode(function(){ state.mode = null; state.view = 'bilan'; state.bilanKind = 'event'; state.detailFromTab = false; cart = []; toggleViews(); render(); }); });
+    document.getElementById('btnHomeB').addEventListener('click', function(){ if (goHomeRef) goHomeRef(); });
+    document.getElementById('segEvent').addEventListener('click', function(){ state.bilanKind = 'event'; render(); });
+    document.getElementById('segBuv').addEventListener('click', function(){ state.bilanKind = 'buvette'; render(); });
     document.getElementById('tabProduits').addEventListener('click', function(){ requireCode(function(){ state.view='produits'; toggleViews(); render(); }); });
     document.getElementById('btnImport').addEventListener('click', function(){ openImport('catalogue'); });
     document.getElementById('btnImportBuv').addEventListener('click', function(){ openImport('buvette'); });
@@ -2520,7 +2728,16 @@
     document.getElementById('btnEditBuv').addEventListener('click', function(){ openCardEditor(null, 'buvette'); });
     document.getElementById('catSearch').addEventListener('input', function(){ renderProduits(); });
     document.getElementById('edSearch').addEventListener('input', function(){ var q = normTxt(this.value); document.querySelectorAll('#cardRows .prep-row').forEach(function(r){ r.hidden = !!q && r.getAttribute('data-n').indexOf(q) < 0; }); });
+    ['edNewCat','prepNewCat','inpProdCat'].forEach(function(id){ var el = document.getElementById(id); if (el) el.innerHTML = catOptions(id === 'inpProdCat' ? 'grill' : 'grill', false); });
+    document.getElementById('edNewCat').addEventListener('change', function(){ document.getElementById('edNewPrep').checked = catDefaultPrep(this.value); });
+    document.getElementById('prepNewCat').addEventListener('change', function(){ document.getElementById('prepNewPrep').checked = catDefaultPrep(this.value); });
+    document.getElementById('inpProdCat').addEventListener('change', function(){ document.getElementById('inpProdPrep').checked = catDefaultPrep(this.value); });
     document.getElementById('btnEdNew').addEventListener('click', addProductInEditor);
+    document.getElementById('btnEdFormule').addEventListener('click', function(){ openFormula(cardDraft && cardDraft.mode === 'buvette' ? 'buvette' : 'card'); });
+    document.getElementById('btnPrepFormule').addEventListener('click', function(){ openFormula('event'); });
+    document.getElementById('fmSearch').addEventListener('input', function(){ var q = normTxt(this.value); document.querySelectorAll('#fmList .prep-row').forEach(function(r){ r.hidden = !!q && r.getAttribute('data-n').indexOf(q) < 0; }); });
+    document.getElementById('btnFmCancel').addEventListener('click', function(){ document.getElementById('overlayFormule').hidden = true; });
+    document.getElementById('btnFmSave').addEventListener('click', saveFormula);
     document.getElementById('btnCardCancel').addEventListener('click', function(){ document.getElementById('overlayCard').hidden = true; });
     document.getElementById('btnCardSave').addEventListener('click', async function(){
       if (cardDraft.mode === 'buvette'){
@@ -2577,7 +2794,7 @@
       saveEventFields(ev, { countedAmount: round2(c), expectedAmount: expected, gapAmount: round2(c - expected), countedAt: now, cashLog: (ev.cashLog || []).concat([{ t: now, kind: 'comptage', amount: round2(c), by: by }]) });
       showToast('Comptage enregistré'); document.getElementById('overlayCash').hidden = true;
     });
-    document.getElementById('btnBackDetail').addEventListener('click', function(){ state.view='historique'; toggleViews(); render(); });
+    document.getElementById('btnBackDetail').addEventListener('click', function(){ state.view = state.mode ? 'vente' : 'bilan'; state.detailFromTab = false; toggleViews(); render(); });
 
     document.getElementById('btnUndo').addEventListener('click', undoLast);
     document.getElementById('appVer').textContent = APP_VERSION;
@@ -2587,6 +2804,8 @@
     document.getElementById('btnSound').addEventListener('click', function(){ soundOn = !soundOn; try { localStorage.setItem('ccbb_son', soundOn ? '1' : '0'); } catch(e){} renderSoundBtn(); if (soundOn){ unlockAudio(); beep(); } });
     renderSoundBtn();
     function goHome(){ state.mode = null; state.view = 'accueil'; cart = []; try { localStorage.removeItem('ccbb_last'); } catch(e){} toggleViews(); render(); }
+    goHomeRef = goHome;
+    document.getElementById('btnBuvReopen').addEventListener('click', function(){ var ev = state.events.find(function(e){ return e.id === buvetteId(); }); if (ev) store.events.update(ev.id, { status: 'open', closedAt: null }); });
     document.getElementById('btnHome').addEventListener('click', goHome);
     document.getElementById('btnHomeP').addEventListener('click', goHome);
     document.getElementById('btnHomeR').addEventListener('click', goHome);
@@ -2662,7 +2881,7 @@
     document.getElementById('btnCancelNewEvent').addEventListener('click', function(){ document.getElementById('overlayNewEvent').hidden = true; });
     document.getElementById('btnConfirmNewEvent').addEventListener('click', function(){ saveEvent(true); });
     document.getElementById('btnSavePrep').addEventListener('click', function(){ saveEvent(false); });
-    document.getElementById('btnPrepNew').addEventListener('click', function(){ document.getElementById('prepNewName').value=''; document.getElementById('prepNewPrice').value=''; document.getElementById('prepNewForm').hidden = false; });
+    document.getElementById('btnPrepNew').addEventListener('click', function(){ document.getElementById('prepNewName').value=''; document.getElementById('prepNewPrice').value=''; document.getElementById('prepNewCost').value=''; document.getElementById('prepNewForm').hidden = false; });
     document.getElementById('btnPrepNewCancel').addEventListener('click', function(){ document.getElementById('prepNewForm').hidden = true; });
     document.getElementById('btnPrepNewAdd').addEventListener('click', async function(){
       var name = document.getElementById('prepNewName').value.trim();
@@ -2670,9 +2889,10 @@
       if (!name){ document.getElementById('prepNewName').focus(); return; }
       var cat = document.getElementById('prepNewCat').value, prep = document.getElementById('prepNewPrep').checked;
       var maxOrder = state.products.reduce(function(m,p){ return Math.max(m, p.order||0); }, -1);
-      var pr = { name: name, price: price, cost: 0, category: cat, order: maxOrder+1, active: true, prep: prep, buvette: false, recap: '' };
+      var cst = parseFloat(document.getElementById('prepNewCost').value) || 0;
+      var pr = { name: name, price: price, cost: cst, category: cat, order: maxOrder+1, active: true, prep: prep, buvette: false, recap: '' };
       var id = await store.products.add(pr);
-      prepDraft.rows.push({ productId: id, name: name, category: cat, prep: prep, recap: '', cost: 0, checked: true, price: price });
+      prepDraft.rows.push({ productId: id, name: name, category: cat, prep: prep, recap: '', cost: cst, checked: true, price: price });
       document.getElementById('prepNewForm').hidden = true;
       renderPrepRows();
     });
@@ -2681,7 +2901,7 @@
       document.getElementById('inpProdName').value = '';
       document.getElementById('inpProdPrice').value = '';
       document.getElementById('inpProdCost').value = '';
-      document.getElementById('inpProdCat').value = 'grill';
+      document.getElementById('inpProdCat').value = 'grill'; document.getElementById('inpProdPrep').checked = true;
       document.getElementById('inpProdPrep').checked = true;
       document.getElementById('inpProdBuv').checked = false;
       document.getElementById('inpProdRecap').value = '';
@@ -2705,10 +2925,10 @@
     });
 
     document.getElementById('btnExportAll').addEventListener('click', function(){
-      exportCsv(state.orders, 'ventes_ccbb_' + todayISO() + '.csv', 'csvAllBox', 'btnCopyAll', true);
+      exportCsv(bilanOrders(), 'ventes_ccbb_' + (state.bilanKind === 'buvette' ? 'buvette_' : 'evenements_') + todayISO() + '.csv', 'csvAllBox', 'btnCopyAll', true);
     });
     document.getElementById('btnCopyAll').addEventListener('click', function(){ copyBox('csvAllBox'); });
-    document.getElementById('btnShareAll').addEventListener('click', function(){ shareCsv(state.orders, 'ventes_ccbb_' + todayISO() + '.csv', true, 'Ventes CCBB'); });
+    document.getElementById('btnShareAll').addEventListener('click', function(){ shareCsv(bilanOrders(), 'ventes_ccbb_' + (state.bilanKind === 'buvette' ? 'buvette_' : 'evenements_') + todayISO() + '.csv', true, 'Ventes CCBB'); });
     document.getElementById('btnShareEvent').addEventListener('click', function(){
       var ev = state.events.find(function(e){ return e.id === state.detailEventId; });
       if (ev) shareCsv(ordersFor(ev.id), 'ventes_' + slugify(ev.name) + '.csv', false, 'Ventes ' + ev.name);
